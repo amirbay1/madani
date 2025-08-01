@@ -605,7 +605,7 @@
             let currentArticleId = null; // برای نگهداری شناسه ماده‌ای که در حال ویرایش یادداشت/تحلیل آن هستیم
             let currentLawId = 'madani'; // قانون پیش‌فرض هنگام بارگذاری اولیه
 
-            // پیکربندی قوانین
+            // پیکربندی قوانین (مسیر فایل‌ها اصلاح شد)
             const lawConfigs = [
                 { id: 'madani', name: 'قانون مدنی', fileName: 'madani/madani.xml' },
                 { id: 'shora', name: 'قانون شوراها', fileName: 'shora/shora.xml' },
@@ -790,10 +790,11 @@
                     let contentHtml = articleNode.textContent.trim().replace(/\n/g, '<br>');
 
                     if (query && query.length > 0) {
-                        // هایلایت کردن کلمات جستجو شده
+                        // هایلایت کردن کلمات جستجو شده با استفاده از مرز کلمات
                         const queryWords = query.split(/\s+/).filter(word => word.length > 0);
                         queryWords.forEach(word => {
-                            const regex = new RegExp(`(${word})`, 'gi');
+                            // از \b برای تطابق دقیق کلمه استفاده می‌کنیم
+                            const regex = new RegExp('\\b' + word + '\\b', 'gi'); 
                             contentHtml = contentHtml.replace(regex, '<span class="highlight">$&</span>');
                         });
                     }
@@ -1008,12 +1009,15 @@
                 // کلمات جستجو را بر اساس فاصله جدا کن و کلمات خالی را حذف کن
                 const queryWords = lowerCaseQuery.split(/\s+/).filter(word => word.length > 0); 
 
+                // ایجاد regex برای هر کلمه با استفاده از مرز کلمات برای تطابق دقیق
+                const queryWordRegexes = queryWords.map(word => new RegExp('\\b' + word + '\\b', 'i'));
+
                 const filteredArticles = allArticles.filter(articleNode => {
                     const title = articleNode.tagName.toLowerCase().replace('ماده_', 'ماده ').replace('_', ' مکرر ');
                     const content = articleNode.textContent.toLowerCase();
                     
                     // برای دقت بیشتر، باید تمام کلمات جستجو در عنوان یا محتوا وجود داشته باشند (AND logic)
-                    return queryWords.every(word => title.includes(word) || content.includes(word));
+                    return queryWordRegexes.every(regex => regex.test(title) || regex.test(content));
                 });
 
                 renderArticles(filteredArticles, query); 
@@ -1138,7 +1142,7 @@
                 });
 
                 articlesContainer.innerHTML = '<p class="loading">در حال بارگذاری مواد قانون از حافظه داخلی یا گیت‌هاب...</p>';
-                window.scrollTo(0, 0); // اسکرول به بالای صفحه
+                window.scrollTo(0, 0); // اسکرول به بالای صفحه قبل از بارگذاری
 
                 let xmlString = null;
                 const xmlStorageKey = `law_${lawId}_xml`; // کلید ذخیره‌سازی XML برای هر قانون
@@ -1204,6 +1208,7 @@
 
                     renderArticles(allArticles); 
                     searchInput.value = ''; // پاک کردن نوار جستجو پس از بارگذاری قانون جدید
+                    window.scrollTo(0, 0); // اسکرول نهایی به بالای صفحه پس از رندر
                 } catch (error) {
                     console.error('Error parsing XML content:', error);
                     articlesContainer.innerHTML = `<p class="error">خطا در پردازش مواد قانون ${lawConfig.name}: ${error.message}</p>`;
@@ -1231,4 +1236,3 @@
     </script>
 </body>
 </html>
-
