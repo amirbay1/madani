@@ -454,11 +454,59 @@
                 padding: 15px;
             }
         }
+        /* استایل برای دکمه‌های انتخاب قانون */
+        .law-selection-controls {
+            display: flex;
+            flex-wrap: wrap; /* برای ریسپانسیو بودن و شکستن خط در صفحات کوچک */
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        body.dark-mode .law-selection-controls {
+            border-bottom-color: #444;
+        }
+        .law-selection-controls button {
+            padding: 8px 15px;
+            background-color: #007bff; /* آبی برای دکمه‌های قانون */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-family: 'Vazirmatn', 'B Nazanin', 'Arial', sans-serif;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .law-selection-controls button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px); /* افکت کوچک هنگام هاور */
+        }
+        .law-selection-controls button.active-law {
+            background-color: #28a745; /* سبز برای قانون فعال */
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+        }
+        body.dark-mode .law-selection-controls button {
+            background-color: #17a2b8; /* آبی روشن‌تر در حالت تاریک */
+        }
+        body.dark-mode .law-selection-controls button:hover {
+            background-color: #138496;
+        }
+        body.dark-mode .law-selection-controls button.active-law {
+            background-color: #90ee90; /* سبز روشن‌تر در حالت تاریک */
+            color: #333;
+            box-shadow: 0 0 8px rgba(144, 238, 144, 0.5);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>قانون مدنی ایران</h1>
+        <h1>قوانین ایران</h1>
+
+        <!-- بخش انتخاب قوانین -->
+        <div id="lawSelectionControls" class="law-selection-controls">
+            <!-- دکمه‌های قوانین اینجا به صورت پویا اضافه می‌شوند -->
+        </div>
 
         <div class="controls">
             <button id="darkModeToggle">حالت تاریک</button>
@@ -469,7 +517,7 @@
         </div>
 
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="جستجو در مواد قانون مدنی..." dir="rtl">
+            <input type="text" id="searchInput" placeholder="جستجو در مواد قانون فعلی..." dir="rtl">
         </div>
 
         <div id="articles-container">
@@ -523,13 +571,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const githubXmlUrl = 'https://raw.githubusercontent.com/amirbay1/gh/refs/heads/main/benzin.xml';
+            const baseGithubUrl = 'https://raw.githubusercontent.com/amirbay1/gh/refs/heads/main/'; // مسیر پایه
             const articlesContainer = document.getElementById('articles-container');
             const searchInput = document.getElementById('searchInput');
             const darkModeToggle = document.getElementById('darkModeToggle');
             const resetSearchButton = document.getElementById('resetSearchButton');
             const showBookmarksBtn = document.getElementById('showBookmarksBtn');
             const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+            const lawSelectionControls = document.getElementById('lawSelectionControls');
 
             // عناصر مودال یادداشت
             const noteModal = document.getElementById('noteModal');
@@ -554,6 +603,17 @@
 
             let allArticles = []; // برای ذخیره تمام مواد قانون پس از بارگذاری
             let currentArticleId = null; // برای نگهداری شناسه ماده‌ای که در حال ویرایش یادداشت/تحلیل آن هستیم
+            let currentLawId = 'madani'; // قانون پیش‌فرض هنگام بارگذاری اولیه
+
+            // پیکربندی قوانین
+            const lawConfigs = [
+                { id: 'madani', name: 'قانون مدنی', fileName: 'madani.xml' },
+                { id: 'shora', name: 'قانون شوراها', fileName: 'shora.xml' },
+                { id: 'adk', name: 'آیین دادرسی کیفری', fileName: 'adk.xml' },
+                { id: 'adm', name: 'آیین دادرسی مدنی', fileName: 'adm.xml' },
+                { id: 'tej', name: 'قانون تجارت', fileName: 'tej.xml' },
+                { id: 'jaza', name: 'قانون جزا', fileName: 'jaza.xml' },
+            ];
 
             // --- IndexedDB Setup ---
             const DB_NAME = 'CivilCodeDB';
@@ -566,18 +626,18 @@
             // تابع برای باز کردن/ایجاد دیتابیس IndexedDB
             function openDatabase() {
                 return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(DB_NAME, 2); // افزایش ورژن دیتابیس برای اضافه کردن استورهای جدید
+                    const request = indexedDB.open(DB_NAME, 2); 
 
                     request.onupgradeneeded = (event) => {
                         db = event.target.result;
                         if (!db.objectStoreNames.contains(STORE_NAME)) {
-                            db.createObjectStore(STORE_NAME, { keyPath: 'id' }); // برای نشان‌گذاری و یادداشت
+                            db.createObjectStore(STORE_NAME, { keyPath: 'id' }); 
                         }
                         if (!db.objectStoreNames.contains(XML_STORE_NAME)) {
-                            db.createObjectStore(XML_STORE_NAME, { keyPath: 'id' }); // برای ذخیره کل XML
+                            db.createObjectStore(XML_STORE_NAME, { keyPath: 'id' }); 
                         }
                         if (!db.objectStoreNames.contains(ANALYSIS_STORE_NAME)) {
-                            db.createObjectStore(ANALYSIS_STORE_NAME, { keyPath: 'id' }); // برای ذخیره تحلیل‌ها
+                            db.createObjectStore(ANALYSIS_STORE_NAME, { keyPath: 'id' }); 
                         }
                     };
 
@@ -630,15 +690,19 @@
 
             // تابع برای دریافت داده‌های یک ماده (نشان‌گذاری و یادداشت)
             async function getArticleMetadata(articleId) {
-                const data = await getDataFromStore(STORE_NAME, articleId);
+                // کلید شامل lawId و articleId خواهد بود
+                const compositeId = `${currentLawId}_${articleId}`;
+                const data = await getDataFromStore(STORE_NAME, compositeId);
                 if (data && data.note) {
                     data.note = LZString.decompressFromUTF16(data.note);
                 }
-                return data || { id: articleId, bookmarked: false, note: '' };
+                return data || { id: compositeId, bookmarked: false, note: '' };
             }
 
             // تابع برای ذخیره داده‌های یک ماده (نشان‌گذاری و یادداشت)
             async function saveArticleMetadata(articleId, data) {
+                const compositeId = `${currentLawId}_${articleId}`;
+                data.id = compositeId; // اطمینان از صحت کلید
                 if (data.note) {
                     data.note = LZString.compressToUTF16(data.note);
                 } else {
@@ -649,9 +713,9 @@
 
             // تابع برای دریافت تحلیل ماده
             async function getArticleAnalysis(articleId) {
-                const data = await getDataFromStore(ANALYSIS_STORE_NAME, articleId);
+                const compositeId = `${currentLawId}_${articleId}`;
+                const data = await getDataFromStore(ANALYSIS_STORE_NAME, compositeId);
                 if (data && data.content) {
-                    // تحلیل به صورت JSON ذخیره شده، پس باید آن را parse کنیم
                     return JSON.parse(LZString.decompressFromUTF16(data.content));
                 }
                 return null;
@@ -659,9 +723,9 @@
 
             // تابع برای ذخیره تحلیل ماده
             async function saveArticleAnalysis(articleId, analysisContent) {
-                // تحلیل را به صورت JSON stringify و سپس فشرده می‌کنیم
+                const compositeId = `${currentLawId}_${articleId}`;
                 const compressedContent = LZString.compressToUTF16(JSON.stringify(analysisContent));
-                await putDataIntoStore(ANALYSIS_STORE_NAME, { id: articleId, content: compressedContent });
+                await putDataIntoStore(ANALYSIS_STORE_NAME, { id: compositeId, content: compressedContent });
             }
 
             // --- End IndexedDB Setup ---
@@ -726,8 +790,12 @@
                     let contentHtml = articleNode.textContent.trim().replace(/\n/g, '<br>');
 
                     if (query && query.length > 0) {
-                        const regex = new RegExp(`(${query.split(/\s+/).join('|')})`, 'gi');
-                        contentHtml = contentHtml.replace(regex, '<span class="highlight">$&</span>');
+                        // هایلایت کردن کلمات جستجو شده
+                        const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+                        queryWords.forEach(word => {
+                            const regex = new RegExp(`(${word})`, 'gi');
+                            contentHtml = contentHtml.replace(regex, '<span class="highlight">$&</span>');
+                        });
                     }
                     
                     articleContentDiv.innerHTML = contentHtml;
@@ -914,6 +982,14 @@
                 analysisContentDisplay.innerHTML = displayHtml;
             }
 
+            // تابع برای تبدیل Article ID به فرمت عددی برای مرتب‌سازی
+            function parseArticleIdForSorting(id) {
+                const parts = id.replace('ماده_', '').split('_');
+                const mainNumber = parseInt(parts[0], 10);
+                // اگر بخش دومی (مکرر) وجود داشت، آن را به عنوان عدد دوم در نظر بگیر، وگرنه 0
+                const subNumber = parts.length > 1 ? parseInt(parts[1], 10) : 0;
+                return [mainNumber, subNumber];
+            }
 
             // تابع برای انجام جستجو
             function performSearch() {
@@ -922,21 +998,26 @@
                 const query = searchInput.value.trim(); 
                 
                 if (query === '') {
+                    // اگر جستجو خالی بود، مواد را به ترتیب اصلی نمایش بده
                     renderArticles(allArticles); 
+                    window.scrollTo(0, 0); // اسکرول به بالای صفحه
                     return;
                 }
 
                 const lowerCaseQuery = query.toLowerCase();
+                // کلمات جستجو را بر اساس فاصله جدا کن و کلمات خالی را حذف کن
                 const queryWords = lowerCaseQuery.split(/\s+/).filter(word => word.length > 0); 
 
                 const filteredArticles = allArticles.filter(articleNode => {
                     const title = articleNode.tagName.toLowerCase().replace('ماده_', 'ماده ').replace('_', ' مکرر ');
                     const content = articleNode.textContent.toLowerCase();
                     
-                    return queryWords.some(word => title.includes(word) || content.includes(word));
+                    // برای دقت بیشتر، باید تمام کلمات جستجو در عنوان یا محتوا وجود داشته باشند (AND logic)
+                    return queryWords.every(word => title.includes(word) || content.includes(word));
                 });
 
                 renderArticles(filteredArticles, query); 
+                window.scrollTo(0, 0); // اسکرول به بالای صفحه پس از جستجو
             }
 
             searchInput.addEventListener('input', performSearch);
@@ -945,7 +1026,8 @@
             resetSearchButton.addEventListener('click', () => {
                 searchInput.value = ''; 
                 showBookmarksBtn.classList.remove('active-filter');
-                renderArticles(allArticles); 
+                renderArticles(allArticles); // نمایش همه مواد به ترتیب مرتب شده
+                window.scrollTo(0, 0); // اسکرول به بالای صفحه
             });
 
             // --- تابع فیلتر نشان‌گذاری‌ها ---
@@ -960,7 +1042,9 @@
                         bookmarkedArticles.push(articleNode);
                     }
                 }
+                // مواد نشان‌گذاری شده را نیز به ترتیب مرتب شده نمایش بده
                 renderArticles(bookmarkedArticles);
+                window.scrollTo(0, 0); // اسکرول به بالای صفحه
             }
 
             showBookmarksBtn.addEventListener('click', filterBookmarks);
@@ -1031,37 +1115,63 @@
             });
             // --- پایان منطق دکمه رفتن به بالای صفحه ---
 
-            // --- بارگذاری اولیه مواد (با اولویت IndexedDB) ---
-            openDatabase().then(async () => {
+            // تابع برای بارگذاری یک قانون خاص
+            async function loadLaw(lawId) {
+                currentLawId = lawId;
+                const lawConfig = lawConfigs.find(law => law.id === lawId);
+                if (!lawConfig) {
+                    articlesContainer.innerHTML = `<p class="error">خطا: قانون "${lawId}" یافت نشد.</p>`;
+                    return;
+                }
+
+                // به‌روزرسانی عنوان اصلی صفحه
+                document.querySelector('h1').textContent = lawConfig.name;
+                searchInput.placeholder = `جستجو در مواد ${lawConfig.name}...`;
+
+                // فعال کردن دکمه قانون فعلی
+                document.querySelectorAll('.law-selection-controls button').forEach(button => {
+                    if (button.dataset.lawId === lawId) {
+                        button.classList.add('active-law');
+                    } else {
+                        button.classList.remove('active-law');
+                    }
+                });
+
+                articlesContainer.innerHTML = '<p class="loading">در حال بارگذاری مواد قانون از حافظه داخلی یا گیت‌هاب...</p>';
+                window.scrollTo(0, 0); // اسکرول به بالای صفحه
+
                 let xmlString = null;
+                const xmlStorageKey = `law_${lawId}_xml`; // کلید ذخیره‌سازی XML برای هر قانون
+                const lawXmlUrl = baseGithubUrl + lawConfig.fileName;
+
                 try {
                     // تلاش برای بارگذاری XML فشرده از IndexedDB
-                    const cachedXml = await getDataFromStore(XML_STORE_NAME, 'full_civil_code_xml');
+                    const cachedXml = await getDataFromStore(XML_STORE_NAME, xmlStorageKey);
                     if (cachedXml && cachedXml.data) {
                         xmlString = LZString.decompressFromUTF16(cachedXml.data);
-                        console.log('XML content loaded from IndexedDB.');
+                        console.log(`XML content for ${lawId} loaded from IndexedDB.`);
                     }
                 } catch (error) {
-                    console.error('Error loading XML from IndexedDB:', error);
+                    console.error(`Error loading XML for ${lawId} from IndexedDB:`, error);
                 }
 
                 if (!xmlString) {
                     // اگر در IndexedDB نبود، از گیت‌هاب فچ کن
                     try {
-                        const response = await exponentialBackoffFetch(githubXmlUrl); // استفاده از تابع جدید
+                        const response = await exponentialBackoffFetch(lawXmlUrl);
                         if (!response.ok) {
                             throw new Error(`خطا در بارگذاری فایل: ${response.status} ${response.statusText}`);
                         }
                         xmlString = await response.text();
-                        console.log('XML content fetched from GitHub.');
+                        console.log(`XML content for ${lawId} fetched from GitHub.`);
                         // ذخیره XML فشرده در IndexedDB برای استفاده آفلاین
                         const compressedXml = LZString.compressToUTF16(xmlString);
-                        await putDataIntoStore(XML_STORE_NAME, { id: 'full_civil_code_xml', data: compressedXml });
-                        console.log('XML content saved to IndexedDB.');
+                        await putDataIntoStore(XML_STORE_NAME, { id: xmlStorageKey, data: compressedXml });
+                        console.log(`XML content for ${lawId} saved to IndexedDB.`);
                     } catch (error) {
-                        console.error('There was a problem fetching the XML file:', error);
-                        articlesContainer.innerHTML = `<p class="error">خطا در بارگذاری مواد: ${error.message}. لطفاً اتصال اینترنت خود را بررسی کنید.</p>`;
-                        return; // اگر نتوانستیم از هیچ منبعی بارگذاری کنیم، متوقف شو
+                        console.error(`There was a problem fetching the XML file for ${lawId}:`, error);
+                        articlesContainer.innerHTML = `<p class="error">خطا در بارگذاری مواد قانون ${lawConfig.name}: ${error.message}. لطفاً اتصال اینترنت خود را بررسی کنید.</p>`;
+                        return;
                     }
                 }
 
@@ -1071,21 +1181,48 @@
                     const xmlDoc = parser.parseFromString(xmlString, 'application/xml');
 
                     if (xmlDoc.getElementsByTagName("parsererror").length > 0) {
-                        throw new Error("خطا در تجزیه فایل XML. لطفاً از صحت ساختار XML اطin حاصل کنید.");
+                        throw new Error("خطا در تجزیه فایل XML. لطفاً از صحت ساختار XML اطمینان حاصل کنید.");
                     }
 
                     allArticles = Array.from(xmlDoc.querySelectorAll('قوانین > *'));
                     
+                    // مرتب‌سازی مواد بلافاصله پس از بارگذاری
+                    allArticles.sort((a, b) => {
+                        const [aMain, aSub] = parseArticleIdForSorting(a.tagName);
+                        const [bMain, bSub] = parseArticleIdForSorting(b.tagName);
+
+                        if (aMain !== bMain) {
+                            return aMain - bMain;
+                        }
+                        return aSub - bSub;
+                    });
+
                     if (allArticles.length === 0) {
-                        articlesContainer.innerHTML = '<p class="error">ماده‌ای در فایل XML یافت نشد. لطفاً ساختار فایل را بررسی کنید.</p>';
+                        articlesContainer.innerHTML = `<p class="no-results">ماده‌ای در فایل XML قانون ${lawConfig.name} یافت نشد. لطفاً ساختار فایل را بررسی کنید.</p>`;
                         return;
                     }
 
                     renderArticles(allArticles); 
+                    searchInput.value = ''; // پاک کردن نوار جستجو پس از بارگذاری قانون جدید
                 } catch (error) {
                     console.error('Error parsing XML content:', error);
-                    articlesContainer.innerHTML = `<p class="error">خطا در پردازش مواد قانون: ${error.message}</p>`;
+                    articlesContainer.innerHTML = `<p class="error">خطا در پردازش مواد قانون ${lawConfig.name}: ${error.message}</p>`;
                 }
+            }
+
+            // ایجاد دکمه‌های انتخاب قانون به صورت پویا
+            lawConfigs.forEach(law => {
+                const button = document.createElement('button');
+                button.textContent = law.name;
+                button.dataset.lawId = law.id;
+                button.addEventListener('click', () => loadLaw(law.id));
+                lawSelectionControls.appendChild(button);
+            });
+
+            // --- بارگذاری اولیه برنامه ---
+            openDatabase().then(async () => {
+                // بارگذاری قانون پیش‌فرض هنگام شروع برنامه
+                await loadLaw(currentLawId); 
             }).catch(error => {
                 console.error('Failed to open IndexedDB:', error);
                 articlesContainer.innerHTML = `<p class="error">خطا در راه‌اندازی پایگاه داده محلی: ${error.message}</p>`;
