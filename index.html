@@ -992,6 +992,16 @@
                 return [mainNumber, subNumber];
             }
 
+            // تابع جدید برای نرمال‌سازی حروف فارسی
+            function normalizePersianText(text) {
+                if (!text) return '';
+                return text
+                    .replace(/ي/g, 'ی') // Arabic Yeh (U+064A) to Persian Yeh (U+06CC)
+                    .replace(/ك/g, 'ک') // Arabic Keh (U+0643) to Persian Keh (U+06A9)
+                    .replace(/ۀ/g, 'ه') // Heh with Hamza above (U+06C0) to Heh (U+0647)
+                    .replace(/ة/g, 'ت'); // Ta Marbuta (U+0629) to Teh (U+062A)
+            }
+
             // تابع برای انجام جستجو
             function performSearch() {
                 showBookmarksBtn.classList.remove('active-filter');
@@ -999,29 +1009,30 @@
                 const query = searchInput.value.trim(); 
                 
                 if (query === '') {
-                    // اگر جستجو خالی بود، مواد را به ترتیب اصلی نمایش بده
                     renderArticles(allArticles); 
-                    window.scrollTo(0, 0); // اسکرول به بالای صفحه
+                    window.scrollTo(0, 0); 
                     return;
                 }
 
-                const lowerCaseQuery = query.toLowerCase();
-                // کلمات جستجو را بر اساس فاصله جدا کن و کلمات خالی را حذف کن
-                const queryWords = lowerCaseQuery.split(/\s+/).filter(word => word.length > 0); 
+                // نرمال‌سازی و تبدیل به حروف کوچک برای کوئری جستجو
+                const normalizedLowerCaseQuery = normalizePersianText(query).toLowerCase();
+                const queryWords = normalizedLowerCaseQuery.split(/\s+/).filter(word => word.length > 0); 
 
                 // ایجاد regex برای هر کلمه با استفاده از مرز کلمات برای تطابق دقیق
+                // 'i' برای جستجوی Case-Insensitive
                 const queryWordRegexes = queryWords.map(word => new RegExp('\\b' + word + '\\b', 'i'));
 
                 const filteredArticles = allArticles.filter(articleNode => {
-                    const title = articleNode.tagName.toLowerCase().replace('ماده_', 'ماده ').replace('_', ' مکرر ');
-                    const content = articleNode.textContent.toLowerCase();
+                    // نرمال‌سازی و تبدیل به حروف کوچک برای عنوان و محتوای ماده
+                    const title = normalizePersianText(articleNode.tagName.replace('ماده_', 'ماده ').replace('_', ' مکرر ')).toLowerCase();
+                    const content = normalizePersianText(articleNode.textContent).toLowerCase();
                     
-                    // برای دقت بیشتر، باید تمام کلمات جستجو در عنوان یا محتوا وجود داشته باشند (AND logic)
+                    // برای فیلتر کردن، باید تمام کلمات جستجو (با تطابق دقیق کلمه) در عنوان یا محتوا وجود داشته باشند (AND logic)
                     return queryWordRegexes.every(regex => regex.test(title) || regex.test(content));
                 });
 
-                renderArticles(filteredArticles, query); 
-                window.scrollTo(0, 0); // اسکرول به بالای صفحه پس از جستجو
+                renderArticles(filteredArticles, query); // Pass original query for highlighting
+                window.scrollTo(0, 0); 
             }
 
             searchInput.addEventListener('input', performSearch);
@@ -1200,6 +1211,8 @@
                         }
                         return aSub - bSub;
                     });
+                    console.log("Articles sorted after loading for", lawConfig.name, ":", allArticles.map(a => a.tagName));
+
 
                     if (allArticles.length === 0) {
                         articlesContainer.innerHTML = `<p class="no-results">ماده‌ای در فایل XML قانون ${lawConfig.name} یافت نشد. لطفاً ساختار فایل را بررسی کنید.</p>`;
