@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قانون مدنی ایران</title>
+    <title>قوانین ایران</title>
     <!-- اضافه کردن فونت وزیرمتن از Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet">
     <!-- Font Awesome برای آیکون‌ها -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- اضافه کردن Manifest برای PWA -->
+    <link rel="manifest" href="manifest.json">
     
     <style>
         body {
@@ -1261,6 +1264,22 @@
                 console.error('Failed to open IndexedDB:', error);
                 articlesContainer.innerHTML = `<p class="error">خطا در راه‌اندازی پایگاه داده محلی: ${error.message}</p>`;
             });
+
+            // Service Worker Registration
+            // Service workers require HTTPS or localhost. This check prevents errors in non-secure contexts like file:// or blob://
+            if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('service-worker.js')
+                        .then(registration => {
+                            console.log('Service Worker registered with scope:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.error('Service Worker registration failed:', error);
+                        });
+                });
+            } else {
+                console.warn('Service Worker not registered. Service workers require HTTPS or localhost.');
+            }
         });
     </script>
 </body>
