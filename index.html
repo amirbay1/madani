@@ -73,6 +73,21 @@
             color: #f4f4f4;
             border-color: #666;
         }
+        .search-container button { /* Style for the new clear search button */
+            padding: 10px 15px;
+            background-color: #dc3545; /* Red for clear button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-family: 'Vazirmatn', 'B Nazanin', 'Arial', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+        .search-container button:hover {
+            background-color: #c82333;
+        }
+
         .article {
             margin-bottom: 20px;
             padding-bottom: 20px;
@@ -510,7 +525,6 @@
 
         <div class="controls">
             <button id="darkModeToggle">حالت تاریک</button>
-            <button id="resetSearchButton">نمایش همه مواد</button>
             <button id="showBookmarksBtn" title="نمایش مواد نشان‌گذاری شده">
                 <i class="fas fa-bookmark"></i>
             </button>
@@ -518,6 +532,7 @@
 
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="جستجو در مواد قانون فعلی..." dir="rtl">
+            <button id="clearSearchButton">پاک کردن</button>
         </div>
 
         <div id="articles-container">
@@ -574,8 +589,8 @@
             const baseGithubUrl = 'https://raw.githubusercontent.com/amirbay1/gh/refs/heads/main/'; // مسیر پایه
             const articlesContainer = document.getElementById('articles-container');
             const searchInput = document.getElementById('searchInput');
+            const clearSearchButton = document.getElementById('clearSearchButton'); // دکمه جدید پاک کردن جستجو
             const darkModeToggle = document.getElementById('darkModeToggle');
-            const resetSearchButton = document.getElementById('resetSearchButton');
             const showBookmarksBtn = document.getElementById('showBookmarksBtn');
             const scrollToTopBtn = document.getElementById('scrollToTopBtn');
             const lawSelectionControls = document.getElementById('lawSelectionControls');
@@ -790,11 +805,11 @@
                     let contentHtml = articleNode.textContent.trim().replace(/\n/g, '<br>');
 
                     if (query && query.length > 0) {
-                        // هایلایت کردن کلمات جستجو شده با استفاده از مرز کلمات
-                        const queryWords = query.split(/\s+/).filter(word => word.length > 0);
+                        // هایلایت کردن کلمات جستجو شده (substring match)
+                        const queryWords = normalizePersianText(query).split(/\s+/).filter(word => word.length > 0);
                         queryWords.forEach(word => {
-                            // از \b برای تطابق دقیق کلمه استفاده می‌کنیم
-                            const regex = new RegExp('\\b' + word + '\\b', 'gi'); 
+                            // استفاده از Regex برای هایلایت کردن تمام رخدادهای کلمه (case-insensitive)
+                            const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'); 
                             contentHtml = contentHtml.replace(regex, '<span class="highlight">$&</span>');
                         });
                     }
@@ -1018,17 +1033,13 @@
                 const normalizedLowerCaseQuery = normalizePersianText(query).toLowerCase();
                 const queryWords = normalizedLowerCaseQuery.split(/\s+/).filter(word => word.length > 0); 
 
-                // ایجاد regex برای هر کلمه با استفاده از مرز کلمات برای تطابق دقیق
-                // 'i' برای جستجوی Case-Insensitive
-                const queryWordRegexes = queryWords.map(word => new RegExp('\\b' + word + '\\b', 'i'));
-
                 const filteredArticles = allArticles.filter(articleNode => {
                     // نرمال‌سازی و تبدیل به حروف کوچک برای عنوان و محتوای ماده
                     const title = normalizePersianText(articleNode.tagName.replace('ماده_', 'ماده ').replace('_', ' مکرر ')).toLowerCase();
                     const content = normalizePersianText(articleNode.textContent).toLowerCase();
                     
-                    // برای فیلتر کردن، باید تمام کلمات جستجو (با تطابق دقیق کلمه) در عنوان یا محتوا وجود داشته باشند (AND logic)
-                    return queryWordRegexes.every(regex => regex.test(title) || regex.test(content));
+                    // برای فیلتر کردن، باید تمام کلمات جستجو (با تطابق زیررشته) در عنوان یا محتوا وجود داشته باشند (AND logic)
+                    return queryWords.every(word => title.includes(word) || content.includes(word));
                 });
 
                 renderArticles(filteredArticles, query); // Pass original query for highlighting
@@ -1036,14 +1047,19 @@
             }
 
             searchInput.addEventListener('input', performSearch);
-
-            // قابلیت نمایش همه مواد
-            resetSearchButton.addEventListener('click', () => {
-                searchInput.value = ''; 
-                showBookmarksBtn.classList.remove('active-filter');
-                renderArticles(allArticles); // نمایش همه مواد به ترتیب مرتب شده
-                window.scrollTo(0, 0); // اسکرول به بالای صفحه
+            clearSearchButton.addEventListener('click', () => {
+                searchInput.value = '';
+                performSearch(); // Calling performSearch with empty query will reset to all articles
             });
+
+
+            // قابلیت نمایش همه مواد (این دکمه دیگر لازم نیست چون دکمه پاک کردن جستجو این کار را انجام می‌دهد)
+            // resetSearchButton.addEventListener('click', () => {
+            //     searchInput.value = ''; 
+            //     showBookmarksBtn.classList.remove('active-filter');
+            //     renderArticles(allArticles); // نمایش همه مواد به ترتیب مرتب شده
+            //     window.scrollTo(0, 0); // اسکرول به بالای صفحه
+            // });
 
             // --- تابع فیلتر نشان‌گذاری‌ها ---
             async function filterBookmarks() {
