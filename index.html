@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>قوانین ایران</title>
+    <!-- اضافه کردن فونت وزیرمتن از Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome برای آیکون‌ها -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
+    <!-- اضافه کردن Manifest برای PWA -->
     <link rel="manifest" href="manifest.json">
     
     <style>
@@ -88,37 +91,53 @@
             background-color: #c82333;
         }
 
-        .article {
+        /* استایل برای کارت‌های مواد */
+        .article-card {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            position: relative; /* برای موقعیت‌دهی آیکون‌ها */
+            padding: 20px;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        body.dark-mode .article {
-            border-bottom-color: #444;
+        body.dark-mode .article-card {
+            background-color: #3a3a3a;
+            border-color: #555;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-        .article:last-child {
-            border-bottom: none;
+        .article-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
+        body.dark-mode .article-card:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
         .article-title {
             font-weight: bold;
             color: #007bff;
-            margin-bottom: 5px;
-            font-size: 1.1em;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
         }
         body.dark-mode .article-title {
             color: #a0d9ff;
+            border-bottom-color: #555;
         }
         .article-content {
             text-align: justify;
+            margin-bottom: 15px;
         }
-        .loading, .error, .no-results {
+        .loading, .error, .no-results, .initial-message {
             text-align: center;
             padding: 50px;
             font-size: 1.2em;
             color: #888;
         }
-        body.dark-mode .loading, body.dark-mode .no-results {
+        body.dark-mode .loading, body.dark-mode .no-results, body.dark-mode .initial-message {
             color: #bbb;
         }
         body.dark-mode .error {
@@ -136,6 +155,7 @@
         }
         .controls {
             display: flex;
+            flex-wrap: wrap; /* برای ریسپانسیو بودن */
             justify-content: center;
             gap: 15px;
             margin-bottom: 20px;
@@ -191,22 +211,32 @@
             background-color: #ccac00;
         }
 
-        /* استایل‌های آیکون‌های نشان‌گذاری و یادداشت و تحلیل */
+        /* استایل‌های آیکون‌های نشان‌گذاری و یادداشت و تحلیل و کپی */
         .article-actions {
-            position: absolute;
-            top: 10px;
-            left: 10px; /* برای راست‌چین بودن صفحه، آیکون‌ها را در سمت چپ قرار می‌دهیم */
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            justify-content: flex-end; /* قرار دادن دکمه‌ها در سمت چپ (در RTL) */
+            margin-top: 10px;
         }
         .action-icon {
             cursor: pointer;
             color: #888;
             font-size: 1.2em;
             transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* برای وسط چین کردن آیکون */
+            padding: 8px; /* پدینگ برای آیکون تنها */
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            position: relative; /* برای positioning feedback */
+        }
+        .action-icon i {
+            margin: 0; /* اطمینان از عدم وجود حاشیه اضافی روی خود آیکون */
         }
         .action-icon:hover {
             color: #007bff;
+            background-color: #e9ecef;
         }
         .action-icon.bookmarked {
             color: #ffc107; /* رنگ زرد برای نشان‌گذاری شده */
@@ -216,9 +246,11 @@
         }
         body.dark-mode .action-icon {
             color: #bbb;
+            background-color: #555;
         }
         body.dark-mode .action-icon:hover {
             color: #a0d9ff;
+            background-color: #666;
         }
         body.dark-mode .action-icon.bookmarked {
             color: #ffd700;
@@ -231,6 +263,33 @@
         }
         body.dark-mode .action-icon.analysis-icon {
             color: #e6b3ff; /* بنفش روشن‌تر برای حالت تاریک */
+        }
+        .action-icon.copy-icon {
+            background-color: #17a2b8; /* آبی فیروزه‌ای برای کپی */
+            color: white;
+        }
+        .action-icon.copy-icon:hover {
+            background-color: #138496;
+            color: white;
+        }
+        .copy-feedback {
+            position: absolute;
+            top: -25px; /* Adjust as needed */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none; /* Make it unclickable */
+            z-index: 10; /* Ensure it's above other elements */
+        }
+        .copy-feedback.show {
+            opacity: 1;
         }
 
         /* استایل‌های مودال‌ها (یادداشت‌نویسی و تحلیل) */
@@ -253,7 +312,7 @@
             padding: 20px;
             border-radius: 8px;
             width: 90%;
-            max-width: 600px; /* پهن‌تر برای محتوای تحلیل */
+            max-width: 800px; /* Increased max-width for analysis modal */
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             position: relative;
             animation: fadeIn 0.3s;
@@ -281,24 +340,13 @@
         body.dark-mode .modal-header h2 {
             color: #87ceeb;
         }
-        .close-button {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
+        .modal-body { /* Changed from .modal-body textarea, .modal-body .analysis-content-display */
+            max-height: 70vh; /* Set max height for scrollability */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding: 10px; /* Add padding to the scrollable area */
         }
-        .close-button:hover,
-        .close-button:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        body.dark-mode .close-button:hover,
-        body.dark-mode .close-button:focus {
-            color: #fff;
-        }
-        .modal-body textarea, .modal-body .analysis-content-display {
-            width: calc(100% - 20px); /* عرض کامل با در نظر گرفتن پدینگ */
+        .modal-body textarea {
+            width: calc(100% - 20px); /* Adjust width for padding */
             min-height: 150px;
             padding: 10px;
             border: 1px solid #ccc;
@@ -312,38 +360,24 @@
             color: #333;
             transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
-        body.dark-mode .modal-body textarea, body.dark-mode .modal-body .analysis-content-display {
+        body.dark-mode .modal-body textarea {
             background-color: #555;
             color: #f4f4f4;
             border-color: #777;
         }
         .modal-body .analysis-content-display {
+            width: 100%; /* Ensure it takes full width of its container */
             white-space: pre-wrap; /* حفظ فرمت‌بندی متن (مثلاً خطوط جدید) */
-            overflow-y: auto; /* اسکرول عمودی برای محتوای بلند */
-            max-height: 400px; /* حداکثر ارتفاع برای محتوای تحلیل */
+            /* Removed overflow-y and max-height from here as it's now on .modal-body */
             border: none; /* حذف border برای نمایش محتوا */
             background-color: transparent; /* حذف پس‌زمینه برای نمایش محتوا */
             padding: 0; /* حذف پدینگ برای نمایش محتوا */
+            color: #333; /* Ensure text color is consistent */
         }
-        /* استایل برای پیام هشدار در مودال تحلیل */
-        .analysis-warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 15px;
-            text-align: right;
-            font-size: 0.9em;
+        body.dark-mode .modal-body .analysis-content-display {
+            color: #f4f4f4;
         }
-        body.dark-mode .analysis-warning {
-            background-color: #6a5a00;
-            color: #fff;
-            border-color: #998c00;
-        }
-        .analysis-warning i {
-            margin-left: 5px;
-        }
+        /* Removed .analysis-warning as requested */
         .analysis-section-title {
             font-weight: bold;
             color: #0056b3;
@@ -351,6 +385,7 @@
             margin-bottom: 5px;
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
+            font-size: 1.1em; /* Slightly larger for titles */
         }
         body.dark-mode .analysis-section-title {
             color: #87ceeb;
@@ -360,6 +395,7 @@
             list-style-type: disc; /* دایره‌ای برای لیست‌ها */
             padding-right: 20px; /* برای نمایش گلوله‌ها */
             margin-bottom: 10px;
+            line-height: 1.6; /* Better line spacing for lists */
         }
         .analysis-list li {
             margin-bottom: 5px;
@@ -443,20 +479,25 @@
                 margin: 10px;
                 padding: 15px;
             }
+            .search-container {
+                flex-direction: column; /* دکمه جستجو و پاک کردن زیر هم */
+                align-items: stretch;
+            }
             .search-container input[type="text"] {
-                font-size: 0.9em;
+                margin-bottom: 10px;
             }
             .controls button {
                 padding: 6px 10px;
                 font-size: 0.8em;
             }
             .article-actions {
-                top: 5px;
-                left: 5px;
-                gap: 5px;
+                flex-direction: column; /* آیکون‌ها زیر هم */
+                align-items: flex-end;
             }
             .action-icon {
                 font-size: 1em;
+                width: 100%; /* دکمه‌ها عرض کامل بگیرند */
+                justify-content: flex-end; /* متن و آیکون به راست */
             }
             #scrollToTopBtn {
                 bottom: 15px;
@@ -467,6 +508,9 @@
             .modal-content {
                 width: 95%;
                 padding: 15px;
+            }
+            .law-selection-controls button {
+                width: calc(50% - 10px); /* دو دکمه در هر ردیف */
             }
         }
         /* استایل برای دکمه‌های انتخاب قانون */
@@ -503,6 +547,10 @@
             cursor: default; /* تغییر نشانگر ماوس */
             pointer-events: none; /* غیرفعال کردن کلیک */
         }
+        .law-selection-controls button.disabled-for-delay {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         body.dark-mode .law-selection-controls button {
             background-color: #17a2b8; /* آبی روشن‌تر در حالت تاریک */
         }
@@ -514,14 +562,32 @@
             color: #333;
             box-shadow: 0 0 8px rgba(144, 238, 144, 0.5);
         }
+        /* New style for countdown message container */
+        .countdown-message-container {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #0056b3; /* A noticeable color */
+            min-height: 20px; /* To prevent layout shift when message appears/disappears */
+            font-size: 1em;
+        }
+        body.dark-mode .countdown-message-container {
+            color: #87ceeb;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>قوانین ایران</h1>
 
+        <!-- بخش انتخاب قوانین -->
         <div id="lawSelectionControls" class="law-selection-controls">
-            </div>
+            <!-- دکمه‌های قوانین اینجا به صورت پویا اضافه می‌شوند -->
+        </div>
+        <!-- New: Container for countdown message -->
+        <div id="countdownMessageContainer" class="countdown-message-container">
+            <!-- Countdown message will appear here -->
+        </div>
 
         <div class="controls">
             <button id="darkModeToggle">حالت تاریک</button>
@@ -536,10 +602,12 @@
         </div>
 
         <div id="articles-container">
-            <p class="loading">در حال بارگذاری مواد قانون مدنی از گیت‌هاب...</p>
+            <!-- پیام اولیه یا مواد قانون اینجا نمایش داده می‌شوند -->
+            <p class="initial-message">قانون مورد نظر خود را از بالا انتخاب کنید.</p>
         </div>
     </div>
 
+    <!-- مودال یادداشت‌نویسی -->
     <div id="noteModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -556,6 +624,7 @@
         </div>
     </div>
 
+    <!-- مودال تحلیل و نظر مشورتی -->
     <div id="analysisModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -564,6 +633,7 @@
             </div>
             <div class="modal-body">
                 <div id="analysisContentDisplay" class="analysis-content-display" dir="rtl">
+                    <!-- محتوای تحلیل اینجا بارگذاری می‌شود -->
                     <p class="loading-analysis">در حال تولید تحلیل...</p>
                 </div>
             </div>
@@ -573,10 +643,12 @@
         </div>
     </div>
 
+    <!-- دکمه رفتن به بالای صفحه -->
     <button id="scrollToTopBtn" title="برو به بالا">
         <i class="fas fa-arrow-up"></i>
     </button>
 
+    <!-- کتابخانه LZ-String برای فشرده‌سازی -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 
     <script>
@@ -584,11 +656,12 @@
             const baseGithubUrl = 'https://raw.githubusercontent.com/amirbay1/gh/refs/heads/main/'; // مسیر پایه
             const articlesContainer = document.getElementById('articles-container');
             const searchInput = document.getElementById('searchInput');
-            const clearSearchButton = document.getElementById('clearSearchButton'); // دکمه جدید پاک کردن جستجو
+            const clearSearchButton = document.getElementById('clearSearchButton'); 
             const darkModeToggle = document.getElementById('darkModeToggle');
             const showBookmarksBtn = document.getElementById('showBookmarksBtn');
             const scrollToTopBtn = document.getElementById('scrollToTopBtn');
             const lawSelectionControls = document.getElementById('lawSelectionControls');
+            const countdownMessageContainer = document.getElementById('countdownMessageContainer'); // New: Get countdown message container
 
             // عناصر مودال یادداشت
             const noteModal = document.getElementById('noteModal');
@@ -611,9 +684,19 @@
                 });
             });
 
-            let allArticles = []; // برای ذخیره تمام مواد قانون پس از بارگذاری
+            let allArticles = []; // برای ذخیره تمام مواد قانون پس از بارگذاری و مرتب‌سازی
             let currentArticleId = null; // برای نگهداری شناسه ماده‌ای که در حال ویرایش یادداشت/تحلیل آن هستیم
-            let currentLawId = 'madani'; // قانون پیش‌فرض هنگام بارگذاری اولیه
+            let currentLawId = null; // قانون پیش‌فرض: هیچ قانونی انتخاب نشده
+
+            // وضعیت بارگذاری قوانین (برای مدیریت کش)
+            // 'not_loaded': هنوز بارگذاری نشده
+            // 'first_loaded': یک بار بارگذاری شده (چه از کش، چه از گیت‌هاب)
+            let loadedLawsStatus = {}; 
+
+            // وضعیت فعال بودن دکمه‌های قانون (برای مدیریت تأخیر)
+            let isLawButtonClickable = true;
+            let lawButtonTimeoutId = null;
+            let countdownIntervalId = null; // New: To manage countdown interval
 
             // پیکربندی قوانین (مسیر فایل‌ها اصلاح شد)
             const lawConfigs = [
@@ -633,7 +716,10 @@
 
             let db;
 
-            // تابع برای باز کردن/ایجاد دیتابیس IndexedDB
+            /**
+             * Opens or creates the IndexedDB database.
+             * @returns {Promise<IDBDatabase>} A promise that resolves with the database object.
+             */
             function openDatabase() {
                 return new Promise((resolve, reject) => {
                     const request = indexedDB.open(DB_NAME, 2); 
@@ -663,7 +749,12 @@
                 });
             }
 
-            // تابع برای دریافت داده از یک Object Store خاص
+            /**
+             * Retrieves data from a specified IndexedDB object store.
+             * @param {string} storeName - The name of the object store.
+             * @param {string} id - The key of the data to retrieve.
+             * @returns {Promise<any>} A promise that resolves with the retrieved data.
+             */
             async function getDataFromStore(storeName, id) {
                 if (!db) await openDatabase();
                 return new Promise((resolve, reject) => {
@@ -682,7 +773,12 @@
                 });
             }
 
-            // تابع برای ذخیره داده در یک Object Store خاص
+            /**
+             * Stores data in a specified IndexedDB object store.
+             * @param {string} storeName - The name of the object store.
+             * @param {object} data - The data object to store (must have a keyPath property).
+             * @returns {Promise<void>} A promise that resolves when the data is stored.
+             */
             async function putDataIntoStore(storeName, data) {
                 if (!db) await openDatabase();
                 return new Promise((resolve, reject) => {
@@ -698,9 +794,12 @@
                 });
             }
 
-            // تابع برای دریافت داده‌های یک ماده (نشان‌گذاری و یادداشت)
+            /**
+             * Retrieves metadata (bookmark, note) for a specific article.
+             * @param {string} articleId - The ID of the article (e.g., "ماده_1").
+             * @returns {Promise<object>} An object containing metadata.
+             */
             async function getArticleMetadata(articleId) {
-                // کلید شامل lawId و articleId خواهد بود
                 const compositeId = `${currentLawId}_${articleId}`;
                 const data = await getDataFromStore(STORE_NAME, compositeId);
                 if (data && data.note) {
@@ -709,10 +808,15 @@
                 return data || { id: compositeId, bookmarked: false, note: '' };
             }
 
-            // تابع برای ذخیره داده‌های یک ماده (نشان‌گذاری و یادداشت)
+            /**
+             * Saves metadata (bookmark, note) for a specific article.
+             * @param {string} articleId - The ID of the article.
+             * @param {object} data - The metadata object to save.
+             * @returns {Promise<void>}
+             */
             async function saveArticleMetadata(articleId, data) {
                 const compositeId = `${currentLawId}_${articleId}`;
-                data.id = compositeId; // اطمینان از صحت کلید
+                data.id = compositeId; 
                 if (data.note) {
                     data.note = LZString.compressToUTF16(data.note);
                 } else {
@@ -721,7 +825,11 @@
                 await putDataIntoStore(STORE_NAME, data);
             }
 
-            // تابع برای دریافت تحلیل ماده
+            /**
+             * Retrieves AI-generated analysis for a specific article.
+             * @param {string} articleId - The ID of the article.
+             * @returns {Promise<object|null>} The analysis content or null if not found.
+             */
             async function getArticleAnalysis(articleId) {
                 const compositeId = `${currentLawId}_${articleId}`;
                 const data = await getDataFromStore(ANALYSIS_STORE_NAME, compositeId);
@@ -731,34 +839,44 @@
                 return null;
             }
 
-            // تابع برای ذخیره تحلیل ماده
+            /**
+             * Saves AI-generated analysis for a specific article.
+             * @param {string} articleId - The ID of the article.
+             * @param {object} analysisContent - The analysis content object to save.
+             * @returns {Promise<void>}
+             */
             async function saveArticleAnalysis(articleId, analysisContent) {
                 const compositeId = `${currentLawId}_${articleId}`;
                 const compressedContent = LZString.compressToUTF16(JSON.stringify(analysisContent));
                 await putDataIntoStore(ANALYSIS_STORE_NAME, { id: compositeId, content: compressedContent });
             }
 
-            // --- End IndexedDB Setup ---
-
-            // Function to perform fetch with exponential backoff
+            /**
+             * Fetches data from a URL with exponential backoff for retries.
+             * @param {string} url - The URL to fetch.
+             * @param {object} options - Fetch options.
+             * @param {number} retries - Number of retries.
+             * @param {number} delay - Initial delay in ms.
+             * @returns {Promise<Response>} The fetch response.
+             * @throws {Error} If fetch fails after all retries.
+             */
             async function exponentialBackoffFetch(url, options, retries = 3, delay = 1000) {
                 for (let i = 0; i < retries; i++) {
                     try {
                         const response = await fetch(url, options);
                         if (response.ok) {
                             return response;
-                        } else if (response.status === 429 || response.status >= 500) { // Too Many Requests or Server Errors
+                        } else if (response.status === 429 || response.status >= 500) { 
                             console.warn(`Retry ${i + 1}/${retries} for ${url}. Status: ${response.status}. Retrying in ${delay / 1000}ms...`);
                             await new Promise(res => setTimeout(res, delay));
-                            delay *= 2; // Double the delay for the next retry
+                            delay *= 2; 
                         } else {
-                            // For client errors (4xx other than 429), don't retry, just throw
                             const errorText = await response.text();
                             throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
                         }
                     } catch (error) {
                         if (i === retries - 1) {
-                            throw error; // Re-throw if it's the last retry
+                            throw error; 
                         }
                         console.warn(`Fetch error: ${error.message}. Retrying in ${delay / 1000}ms...`);
                         await new Promise(res => setTimeout(res, delay));
@@ -768,61 +886,80 @@
                 throw new Error('Max retries exceeded for fetch operation.');
             }
 
-            // تابع برای نمایش مواد در صفحه
+            /**
+             * Creates a span element with an icon for action buttons.
+             * @param {string} iconClass - The Font Awesome icon class (e.g., 'fa-bookmark').
+             * @param {string} title - The title for the icon (for tooltip/accessibility).
+             * @returns {HTMLSpanElement} The created span element.
+             */
+            const createActionIconSpan = (iconClass, title) => {
+                const span = document.createElement('span');
+                span.classList.add('action-icon');
+                span.title = title;
+                const icon = document.createElement('i');
+                icon.classList.add('fas', iconClass);
+                span.appendChild(icon);
+                return span;
+            };
+
+            /**
+             * Renders a list of articles into the articles container.
+             * @param {Array<Node>} articlesToRender - An array of XML article nodes to render.
+             * @param {string} [query=''] - The search query for highlighting.
+             */
             async function renderArticles(articlesToRender, query = '') {
-                articlesContainer.innerHTML = '';
+                articlesContainer.innerHTML = ''; 
 
                 if (articlesToRender.length === 0) {
                     articlesContainer.innerHTML = '<p class="no-results">نتیجه‌ای یافت نشد.</p>';
                     return;
                 }
 
+                console.log("[renderArticles] Articles received for rendering (first 5):", articlesToRender.slice(0, 5).map(a => a.tagName));
+
                 for (const articleNode of articlesToRender) {
-                    const articleDiv = document.createElement('div');
-                    articleDiv.classList.add('article');
+                    const articleCardDiv = document.createElement('div');
+                    articleCardDiv.classList.add('article-card');
                     
                     const articleId = articleNode.tagName; 
-                    articleDiv.dataset.articleId = articleId;
+                    articleCardDiv.dataset.articleId = articleId;
 
                     const savedMetadata = await getArticleMetadata(articleId);
 
                     const articleTitleDiv = document.createElement('div');
                     articleTitleDiv.classList.add('article-title');
                     let titleText = articleNode.tagName.replace('ماده_', 'ماده ');
+                    // Handle 'مکرر' parts for article titles
                     if (titleText.includes('_')) {
                         titleText = titleText.replace('_', ' مکرر ');
                     }
                     articleTitleDiv.textContent = titleText;
-                    articleDiv.appendChild(articleTitleDiv);
+                    articleCardDiv.appendChild(articleTitleDiv);
 
                     const articleContentDiv = document.createElement('div');
                     articleContentDiv.classList.add('article-content');
                     let contentHtml = articleNode.textContent.trim().replace(/\n/g, '<br>');
 
                     if (query && query.length > 0) {
-                        // هایلایت کردن کلمات جستجو شده (substring match)
                         const queryWords = normalizePersianText(query).split(/\s+/).filter(word => word.length > 0);
                         queryWords.forEach(word => {
-                            // استفاده از Regex برای هایلایت کردن تمام رخدادهای کلمه (case-insensitive)
                             const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'); 
                             contentHtml = contentHtml.replace(regex, '<span class="highlight">$&</span>');
                         });
                     }
                     
                     articleContentDiv.innerHTML = contentHtml;
-                    articleDiv.appendChild(articleContentDiv);
+                    articleCardDiv.appendChild(articleContentDiv);
 
-                    // --- اضافه کردن آیکون‌های نشان‌گذاری، یادداشت و تحلیل ---
+                    // --- اضافه کردن آیکون‌ها و دکمه کپی ---
                     const actionsDiv = document.createElement('div');
                     actionsDiv.classList.add('article-actions');
 
                     // آیکون نشان‌گذاری
-                    const bookmarkIcon = document.createElement('i');
-                    bookmarkIcon.classList.add('action-icon', 'fas', 'fa-bookmark');
+                    const bookmarkIcon = createActionIconSpan('fa-bookmark', 'نشان‌گذاری');
                     if (savedMetadata.bookmarked) {
                         bookmarkIcon.classList.add('bookmarked');
                     }
-                    bookmarkIcon.title = 'نشان‌گذاری';
                     bookmarkIcon.addEventListener('click', async () => {
                         savedMetadata.bookmarked = !savedMetadata.bookmarked;
                         await saveArticleMetadata(articleId, savedMetadata);
@@ -834,12 +971,10 @@
                     actionsDiv.appendChild(bookmarkIcon);
 
                     // آیکون یادداشت
-                    const noteIcon = document.createElement('i');
-                    noteIcon.classList.add('action-icon', 'fas', 'fa-sticky-note');
+                    const noteIcon = createActionIconSpan('fa-sticky-note', 'یادداشت');
                     if (savedMetadata.note && savedMetadata.note.length > 0) {
                         noteIcon.classList.add('has-note');
                     }
-                    noteIcon.title = 'یادداشت';
                     noteIcon.addEventListener('click', async () => {
                         currentArticleId = articleId;
                         noteModalArticleTitle.textContent = `یادداشت برای ${titleText}`;
@@ -849,16 +984,14 @@
                     });
                     actionsDiv.appendChild(noteIcon);
 
-                    // آیکون تحلیل و نظر مشورتی (جدید)
-                    const analysisIcon = document.createElement('i');
-                    analysisIcon.classList.add('action-icon', 'fas', 'fa-balance-scale', 'analysis-icon'); // آیکون ترازو
-                    analysisIcon.title = 'تحلیل و نظر مشورتی';
+                    // آیکون تحلیل و نظر مشورتی
+                    const analysisIcon = createActionIconSpan('fa-balance-scale', 'تحلیل و نظر مشورتی');
+                    analysisIcon.classList.add('analysis-icon'); 
                     analysisIcon.addEventListener('click', async () => {
                         currentArticleId = articleId;
                         analysisModalArticleTitle.textContent = `تحلیل و نظر مشورتی برای ${titleText}`;
-                        analysisModal.style.display = 'flex'; // مودال را باز کن
+                        analysisModal.style.display = 'flex'; 
 
-                        // ابتدا بررسی کن آیا تحلیل قبلاً ذخیره شده است
                         const cachedAnalysis = await getArticleAnalysis(articleId);
                         if (cachedAnalysis) {
                             console.log(`تحلیل برای ${articleId} از IndexedDB بارگذاری شد.`);
@@ -866,12 +999,11 @@
                             return;
                         }
 
-                        // اگر ذخیره نشده بود، پیام بارگذاری را نمایش بده و تحلیل را تولید کن
                         analysisContentDisplay.innerHTML = '<p class="loading-analysis">در حال تولید تحلیل...</p>'; 
 
                         try {
                             const articleContent = articleNode.textContent.trim();
-                            const prompt = `ماده قانونی زیر را تحلیل کنید، نظرات مشورتی ارائه دهید، نکات کلیدی آن را بیان کنید و در صورت امکان مثال‌هایی برای درک بهتر ارائه دهید. پاسخ باید به زبان فارسی و با رعایت ساختار حقوقی باشد. این تحلیل برای اهداف آزمایشی و مقایسه با واقعیت است و نباید به عنوان مشاوره حقوقی معتبر استفاده شود.
+                            const prompt = `ماده قانونی زیر را تحلیل کنید، نظرات مشورتی ارائه دهید، نکات کلیدی آن را بیان کنید و در صورت امکان مثال‌هایی برای درک بهتر ارائه دهید. پاسخ باید به زبان فارسی و با رعایت ساختار حقوقی باشد.
                             
                             ماده: ${articleContent}
                             
@@ -911,14 +1043,14 @@
                             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
                             console.log("Sending request to Gemini API...");
-                            const response = await exponentialBackoffFetch(apiUrl, { // استفاده از تابع جدید
+                            const response = await exponentialBackoffFetch(apiUrl, { 
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(payload)
                             });
 
                             const result = await response.json();
-                            console.log("Raw API result:", result); // لاگ کردن نتیجه خام API
+                            console.log("Raw API result:", result); 
 
                             let generatedContent = {};
 
@@ -926,10 +1058,10 @@
                                 result.candidates[0].content && result.candidates[0].content.parts &&
                                 result.candidates[0].content.parts.length > 0) {
                                 const jsonText = result.candidates[0].content.parts[0].text;
-                                console.log("Raw JSON text from LLM:", jsonText); // لاگ کردن متن JSON خام
+                                console.log("Raw JSON text from LLM:", jsonText); 
                                 try {
                                     generatedContent = JSON.parse(jsonText);
-                                    await saveArticleAnalysis(articleId, generatedContent); // ذخیره تحلیل در IndexedDB
+                                    await saveArticleAnalysis(articleId, generatedContent); 
                                     console.log(`تحلیل برای ${articleId} تولید و ذخیره شد.`);
                                 } catch (parseError) {
                                     console.error("Failed to parse JSON from LLM:", parseError);
@@ -951,24 +1083,49 @@
                     });
                     actionsDiv.appendChild(analysisIcon);
 
-                    articleDiv.appendChild(actionsDiv);
-                    // --- پایان اضافه کردن آیکون‌ها ---
+                    // دکمه کپی
+                    const copyButton = createActionIconSpan('fa-copy', 'کپی متن ماده');
+                    copyButton.classList.add('copy-icon'); 
+                    
+                    const copyFeedback = document.createElement('span');
+                    copyFeedback.classList.add('copy-feedback');
+                    copyFeedback.textContent = 'کپی شد!';
+                    copyButton.appendChild(copyFeedback); 
 
-                    articlesContainer.appendChild(articleDiv);
+                    copyButton.addEventListener('click', () => {
+                        const textToCopy = `${titleText}\n${articleNode.textContent.trim()}`;
+                        const textarea = document.createElement('textarea');
+                        textarea.value = textToCopy;
+                        textarea.style.position = 'fixed'; 
+                        textarea.style.opacity = 0;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        try {
+                            document.execCommand('copy');
+                            copyFeedback.classList.add('show');
+                            setTimeout(() => {
+                                copyFeedback.classList.remove('show');
+                            }, 1500);
+                        } catch (err) {
+                            console.error('Failed to copy text: ', err);
+                        }
+                        document.body.removeChild(textarea);
+                    });
+                    actionsDiv.appendChild(copyButton);
+
+                    articleCardDiv.appendChild(actionsDiv);
+                    // --- پایان اضافه کردن آیکون‌ها و دکمه کپی ---
+
+                    articlesContainer.appendChild(articleCardDiv);
                 }
             }
 
-            // تابع کمکی برای نمایش محتوای تحلیل
+            /**
+             * Displays the AI-generated analysis content in the analysis modal.
+             * @param {object} generatedContent - The parsed JSON content from the AI.
+             */
             function displayAnalysisContent(generatedContent) {
-                let displayHtml = `
-                    <div class="analysis-warning">
-                        <p style="font-weight: bold;"><i class="fas fa-exclamation-triangle"></i> توجه: این تحلیل توسط هوش مصنوعی تولید شده است.</p>
-                        <p>این محتوا صرفاً برای اهداف آزمایشی و مقایسه با واقعیت ارائه شده و نباید به عنوان مشاوره حقوقی معتبر و دقیق استفاده شود.</p>
-                        <p style="font-style: italic; margin-top: 10px;">
-                            برای دریافت مشاوره حقوقی دقیق و معتبر، لطفاً با یک وکیل یا مشاور حقوقی متخصص مشورت نمایید.
-                        </p>
-                    </div>
-                `;
+                let displayHtml = ``; // Removed the warning section as requested
 
                 if (generatedContent.analysis) {
                     displayHtml += `<h3 class="analysis-section-title">تحلیل ماده</h3><p>${generatedContent.analysis}</p>`;
@@ -993,70 +1150,118 @@
                 analysisContentDisplay.innerHTML = displayHtml;
             }
 
-            // تابع برای تبدیل Article ID به فرمت عددی برای مرتب‌سازی
+            /**
+             * Parses an article ID string (e.g., "ماده_1", "ماده_1328_2") into a numeric array for sorting.
+             * @param {string} id - The article ID string.
+             * @returns {number[]} An array [mainNumber, subNumber] for sorting.
+             */
             function parseArticleIdForSorting(id) {
                 const parts = id.replace('ماده_', '').split('_');
                 const mainNumber = parseInt(parts[0], 10);
-                // اگر بخش دومی (مکرر) وجود داشت، آن را به عنوان عدد دوم در نظر بگیر، وگرنه 0
-                const subNumber = parts.length > 1 ? parseInt(parts[1], 10) : 0;
+                const subNumber = parts.length > 1 ? parseInt(parts[1], 10) : 0; // 'مکرر' parts
                 return [mainNumber, subNumber];
             }
 
-            // تابع جدید برای نرمال‌سازی حروف فارسی
+            /**
+             * Helper function to sort articles based on their ID.
+             * @param {Array<Node>} articles - The array of XML article nodes.
+             * @returns {Array<Node>} A new array with sorted articles.
+             */
+            function sortArticles(articles) {
+                // Create a shallow copy to avoid mutating the original array passed if it's from elsewhere
+                return [...articles].sort((a, b) => {
+                    const [aMain, aSub] = parseArticleIdForSorting(a.tagName);
+                    const [bMain, bSub] = parseArticleIdForSorting(b.tagName);
+
+                    if (aMain !== bMain) {
+                        return aMain - bMain;
+                    }
+                    return aSub - bSub;
+                });
+            }
+
+            /**
+             * Normalizes Persian characters for consistent search and display.
+             * @param {string} text - The input text.
+             * @returns {string} The normalized text.
+             */
             function normalizePersianText(text) {
                 if (!text) return '';
                 return text
-                    .replace(/ي/g, 'ی') // Arabic Yeh (U+064A) to Persian Yeh (U+06CC)
-                    .replace(/ك/g, 'ک') // Arabic Keh (U+0643) to Persian Keh (U+06A9)
-                    .replace(/ۀ/g, 'ه') // Heh with Hamza above (U+06C0) to Heh (U+0647)
-                    .replace(/ة/g, 'ت'); // Ta Marbuta (U+0629) to Teh (U+062A)
+                    .replace(/ي/g, 'ی') 
+                    .replace(/ك/g, 'ک') 
+                    .replace(/ۀ/g, 'ه') 
+                    .replace(/ة/g, 'ت'); 
             }
 
-            // تابع برای انجام جستجو
+            let debounceTimer;
+            /**
+             * Debounces a function call, ensuring it's only executed after a certain delay.
+             * @param {function} func - The function to debounce.
+             * @param {number} delay - The delay in milliseconds.
+             */
+            const debounce = (func, delay) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(func, delay);
+            };
+
+            /**
+             * Performs a search on the currently loaded articles.
+             */
             function performSearch() {
                 showBookmarksBtn.classList.remove('active-filter');
                 
                 const query = searchInput.value.trim(); 
                 
                 if (query === '') {
-                    renderArticles(allArticles); 
-                    window.scrollTo(0, 0); 
+                    displayCurrentLawArticles(); 
                     return;
                 }
 
-                // نرمال‌سازی و تبدیل به حروف کوچک برای کوئری جستجو
                 const normalizedLowerCaseQuery = normalizePersianText(query).toLowerCase();
                 const queryWords = normalizedLowerCaseQuery.split(/\s+/).filter(word => word.length > 0); 
 
                 const filteredArticles = allArticles.filter(articleNode => {
-                    // نرمال‌سازی و تبدیل به حروف کوچک برای عنوان و محتوای ماده
                     const title = normalizePersianText(articleNode.tagName.replace('ماده_', 'ماده ').replace('_', ' مکرر ')).toLowerCase();
                     const content = normalizePersianText(articleNode.textContent).toLowerCase();
                     
-                    // برای فیلتر کردن، باید تمام کلمات جستجو (با تطابق زیررشته) در عنوان یا محتوا وجود داشته باشند (AND logic)
                     return queryWords.every(word => title.includes(word) || content.includes(word));
                 });
 
-                renderArticles(filteredArticles, query); // Pass original query for highlighting
+                renderArticles(filteredArticles, query); 
                 window.scrollTo(0, 0); 
             }
 
-            searchInput.addEventListener('input', performSearch);
+            // Apply debounce to search input
+            searchInput.addEventListener('input', () => debounce(performSearch, 300));
+
             clearSearchButton.addEventListener('click', () => {
-                searchInput.value = '';
-                performSearch(); // Calling performSearch with empty query will reset to all articles
+                if (currentLawId) { 
+                    searchInput.value = ''; // Clear input field
+                    displayCurrentLawArticles(); // Reset to full sorted list of current law
+                } else {
+                    articlesContainer.innerHTML = '<p class="initial-message">قانون مورد نظر خود را از بالا انتخاب کنید.</p>';
+                    document.querySelector('h1').textContent = 'قوانین ایران'; 
+                    searchInput.value = ''; // Clear input field
+                }
             });
 
+            /**
+             * Displays the full, sorted list of articles for the currently selected law.
+             * This function ensures consistent rendering from the pre-sorted `allArticles`.
+             */
+            async function displayCurrentLawArticles() {
+                searchInput.value = ''; 
+                showBookmarksBtn.classList.remove('active-filter'); 
+                console.log("[displayCurrentLawArticles] Preparing to render all articles for current law. allArticles (first 5):", allArticles.slice(0, 5).map(a => a.tagName));
+                
+                await renderArticles(allArticles); 
+                window.scrollTo(0, 0); 
+            }
 
-            // قابلیت نمایش همه مواد (این دکمه دیگر لازم نیست چون دکمه پاک کردن جستجو این کار را انجام می‌دهد)
-            // resetSearchButton.addEventListener('click', () => {
-            //     searchInput.value = ''; 
-            //     showBookmarksBtn.classList.remove('active-filter');
-            //     renderArticles(allArticles); // نمایش همه مواد به ترتیب مرتب شده
-            //     window.scrollTo(0, 0); // اسکرول به بالای صفحه
-            // });
-
-            // --- تابع فیلتر نشان‌گذاری‌ها ---
+            /**
+             * Filters and displays only the bookmarked articles.
+             */
             async function filterBookmarks() {
                 searchInput.value = ''; 
                 showBookmarksBtn.classList.add('active-filter');
@@ -1068,9 +1273,9 @@
                         bookmarkedArticles.push(articleNode);
                     }
                 }
-                // مواد نشان‌گذاری شده را نیز به ترتیب مرتب شده نمایش بده
+                // Bookmarked articles are also rendered in their natural sorted order
                 renderArticles(bookmarkedArticles);
-                window.scrollTo(0, 0); // اسکرول به بالای صفحه
+                window.scrollTo(0, 0); 
             }
 
             showBookmarksBtn.addEventListener('click', filterBookmarks);
@@ -1102,9 +1307,9 @@
                     const data = await getArticleMetadata(currentArticleId);
                     data.note = noteContent;
                     await saveArticleMetadata(currentArticleId, data);
-                    const articleDiv = document.querySelector(`[data-article-id="${currentArticleId}"]`);
-                    if (articleDiv) {
-                        const noteIcon = articleDiv.querySelector('.fa-sticky-note');
+                    const articleCardDiv = document.querySelector(`[data-article-id="${currentArticleId}"]`);
+                    if (articleCardDiv) {
+                        const noteIcon = articleCardDiv.querySelector('.fa-sticky-note');
                         if (noteIcon) {
                             noteIcon.classList.toggle('has-note', noteContent.length > 0);
                         }
@@ -1141,10 +1346,66 @@
             });
             // --- پایان منطق دکمه رفتن به بالای صفحه ---
 
-            // تابع برای بارگذاری یک قانون خاص
+            /**
+             * Manages the countdown and disables/enables law selection buttons.
+             * The countdown message is displayed in the dedicated container below the buttons.
+             * @param {number} initialCount - The starting number for the countdown.
+             */
+            function startCountdownAndDisableButtons(initialCount) {
+                let count = initialCount;
+                const buttons = lawSelectionControls.querySelectorAll('button');
+
+                // Disable all buttons and add styling
+                buttons.forEach(button => {
+                    button.disabled = true; // Disable HTML button directly
+                    button.classList.add('disabled-for-delay'); // Add a class for visual styling
+                    // No need to store original text, as text content is not changed
+                });
+
+                // Clear any existing countdown interval
+                if (countdownIntervalId) {
+                    clearInterval(countdownIntervalId);
+                }
+
+                // Start the countdown
+                countdownIntervalId = setInterval(() => {
+                    countdownMessageContainer.textContent = `لطفا برای تغییر قانون صبر کنید (${count})`;
+                    count--;
+
+                    if (count < 0) {
+                        clearInterval(countdownIntervalId);
+                        isLawButtonClickable = true;
+                        buttons.forEach(button => {
+                            button.disabled = false;
+                            button.classList.remove('disabled-for-delay');
+                            // Restore original text (already there, no change needed)
+                        });
+                        countdownMessageContainer.textContent = ''; // Clear the countdown message
+                        lawButtonTimeoutId = null;
+                        console.log("Law buttons re-enabled after countdown.");
+                    }
+                }, 1000); // Update every 1 second
+            }
+
+            /**
+             * Loads a specific law's XML content, parses it, and updates the display.
+             * @param {string} lawId - The ID of the law to load (e.g., 'madani').
+             */
             async function loadLaw(lawId) {
-                // اگر قانون در حال حاضر فعال است، کاری نکن
+                // Check if buttons are currently disabled due to delay
+                if (!isLawButtonClickable) {
+                    console.log(`Buttons are disabled. Cannot click ${lawId} yet.`);
+                    return;
+                }
+
+                // Start countdown and disable buttons for 10 seconds
+                isLawButtonClickable = false;
+                startCountdownAndDisableButtons(10); // Start countdown from 10
+
+                // If the same law is already active, just re-display it (this case is handled by the delay check above)
                 if (currentLawId === lawId) {
+                    console.log(`Law ${lawId} is already active. Re-displaying current articles.`);
+                    await displayCurrentLawArticles(); 
                     return;
                 }
 
@@ -1155,11 +1416,11 @@
                     return;
                 }
 
-                // به‌روزرسانی عنوان اصلی صفحه
+                // Update main page title and search placeholder
                 document.querySelector('h1').textContent = lawConfig.name;
                 searchInput.placeholder = `جستجو در مواد ${lawConfig.name}...`;
 
-                // فعال کردن دکمه قانون فعلی
+                // Activate the current law button visually
                 document.querySelectorAll('.law-selection-controls button').forEach(button => {
                     if (button.dataset.lawId === lawId) {
                         button.classList.add('active-law');
@@ -1168,66 +1429,83 @@
                     }
                 });
 
-                articlesContainer.innerHTML = '<p class="loading">در حال بارگذاری مواد قانون از حافظه داخلی یا گیت‌هاب...</p>';
-                window.scrollTo(0, 0); // اسکرول به بالای صفحه قبل از بارگذاری
+                // Show loading state and scroll to top
+                articlesContainer.innerHTML = '<p class="loading">در حال بارگذاری مواد قانون...</p>';
+                window.scrollTo(0, 0); 
+                searchInput.value = ''; 
+                showBookmarksBtn.classList.remove('active-filter'); 
 
                 let xmlString = null;
-                const xmlStorageKey = `law_${lawId}_xml`; // کلید ذخیره‌سازی XML برای هر قانون
+                const xmlStorageKey = `law_${lawId}_xml`; 
                 const lawXmlUrl = baseGithubUrl + lawConfig.fileName;
 
-                try {
-                    // تلاش برای بارگذاری XML فشرده از IndexedDB
-                    const cachedXml = await getDataFromStore(XML_STORE_NAME, xmlStorageKey);
-                    if (cachedXml && cachedXml.data) {
-                        xmlString = LZString.decompressFromUTF16(cachedXml.data);
-                        console.log(`XML content for ${lawId} loaded from IndexedDB.`);
-                    }
-                } catch (error) {
-                    console.error(`Error loading XML for ${lawId} from IndexedDB:`, error);
-                }
-
-                if (!xmlString) {
-                    // اگر در IndexedDB نبود، از گیت‌هاب فچ کن
+                // Caching Logic: First load from cache, subsequent loads from GitHub
+                if (loadedLawsStatus[lawId] === 'first_loaded') {
+                    // Subsequent load for this law: bypass cache, fetch directly from GitHub
+                    console.log(`Law ${lawId} already loaded once. Fetching directly from GitHub.`);
                     try {
                         const response = await exponentialBackoffFetch(lawXmlUrl);
                         if (!response.ok) {
-                            throw new Error(`خطا در بارگذاری فایل: ${response.status} ${response.statusText}`);
+                            throw new Error(`خطا در بارگذاری فایل از گیت‌هاب: ${response.status} ${response.statusText}`);
                         }
                         xmlString = await response.text();
-                        console.log(`XML content for ${lawId} fetched from GitHub.`);
-                        // ذخیره XML فشرده در IndexedDB برای استفاده آفلاین
-                        const compressedXml = LZString.compressToUTF16(xmlString);
-                        await putDataIntoStore(XML_STORE_NAME, { id: xmlStorageKey, data: compressedXml });
-                        console.log(`XML content for ${lawId} saved to IndexedDB.`);
+                        console.log(`XML content for ${lawId} fetched directly from GitHub successfully.`);
                     } catch (error) {
-                        console.error(`There was a problem fetching the XML file for ${lawId}:`, error);
-                        articlesContainer.innerHTML = `<p class="error">خطا در بارگذاری مواد قانون ${lawConfig.name}: ${error.message}. لطفاً اتصال اینترنت خود را بررسی کنید.</p>`;
+                        console.error(`Error fetching XML for ${lawId} directly from GitHub:`, error);
+                        articlesContainer.innerHTML = `<p class="error">خطا در بارگذاری مواد قانون ${lawConfig.name} از مخزن اصلی: ${error.message}.</p>`;
                         return;
+                    }
+                } else {
+                    // First load for this law: try cache first
+                    try {
+                        const cachedXml = await getDataFromStore(XML_STORE_NAME, xmlStorageKey);
+                        if (cachedXml && cachedXml.data) {
+                            xmlString = LZString.decompressFromUTF16(cachedXml.data);
+                            console.log(`XML content for ${lawId} loaded from IndexedDB (first load).`);
+                            loadedLawsStatus[lawId] = 'first_loaded'; // Mark as first loaded
+                        }
+                    } catch (error) {
+                        console.error(`Error loading XML for ${lawId} from IndexedDB:`, error);
+                    }
+
+                    if (!xmlString) {
+                        // If not in IndexedDB, fetch from GitHub and save
+                        try {
+                            console.log(`Fetching XML for ${lawId} from GitHub (first load, not in cache): ${lawXmlUrl}`);
+                            const response = await exponentialBackoffFetch(lawXmlUrl);
+                            if (!response.ok) {
+                                throw new Error(`خطا در بارگذاری فایل از گیت‌هاب: ${response.status} ${response.statusText}`);
+                            }
+                            xmlString = await response.text();
+                            console.log(`XML content for ${lawId} fetched from GitHub successfully.`);
+                            const compressedXml = LZString.compressToUTF16(xmlString);
+                            await putDataIntoStore(XML_STORE_NAME, { id: xmlStorageKey, data: compressedXml });
+                            console.log(`XML content for ${lawId} saved to IndexedDB.`);
+                            loadedLawsStatus[lawId] = 'first_loaded'; // Mark as first loaded
+                        } catch (error) {
+                            console.error(`There was a problem fetching the XML file for ${lawId} from GitHub:`, error);
+                            articlesContainer.innerHTML = `<p class="error">خطا در بارگذاری مواد قانون ${lawConfig.name}: ${error.message}. لطفاً اتصال اینترنت خود را بررسی کنید.</p>`;
+                            return;
+                        }
                     }
                 }
 
-                // در نهایت، XML را parse و مواد را رندر کن
+                // Finally, parse XML and render articles
                 try {
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(xmlString, 'application/xml');
 
                     if (xmlDoc.getElementsByTagName("parsererror").length > 0) {
+                        console.error("XML parsing error:", xmlDoc.getElementsByTagName("parsererror")[0]);
                         throw new Error("خطا در تجزیه فایل XML. لطفاً از صحت ساختار XML اطمینان حاصل کنید.");
                     }
 
+                    // Populate allArticles and then sort it
                     allArticles = Array.from(xmlDoc.querySelectorAll('قوانین > *'));
+                    console.log(`Raw articles loaded for ${lawConfig.name} (first 5):`, allArticles.slice(0, 5).map(a => a.tagName));
                     
-                    // مرتب‌سازی مواد بلافاصله پس از بارگذاری
-                    allArticles.sort((a, b) => {
-                        const [aMain, aSub] = parseArticleIdForSorting(a.tagName);
-                        const [bMain, bSub] = parseArticleIdForSorting(b.tagName);
-
-                        if (aMain !== bMain) {
-                            return aMain - bMain;
-                        }
-                        return aSub - bSub;
-                    });
-                    console.log("Articles sorted after loading for", lawConfig.name, ":", allArticles.map(a => a.tagName));
+                    allArticles = sortArticles(allArticles); // Use the new helper function for sorting
+                    console.log(`Articles sorted after loading for ${lawConfig.name} (first 5):`, allArticles.slice(0, 5).map(a => a.tagName));
 
 
                     if (allArticles.length === 0) {
@@ -1235,16 +1513,14 @@
                         return;
                     }
 
-                    renderArticles(allArticles); 
-                    searchInput.value = ''; // پاک کردن نوار جستجو پس از بارگذاری قانون جدید
-                    window.scrollTo(0, 0); // اسکرول نهایی به بالای صفحه پس از رندر
+                    displayCurrentLawArticles(); // Display articles after loading and sorting
                 } catch (error) {
                     console.error('Error parsing XML content:', error);
                     articlesContainer.innerHTML = `<p class="error">خطا در پردازش مواد قانون ${lawConfig.name}: ${error.message}</p>`;
                 }
             }
 
-            // ایجاد دکمه‌های انتخاب قانون به صورت پویا
+            // Create law selection buttons dynamically
             lawConfigs.forEach(law => {
                 const button = document.createElement('button');
                 button.textContent = law.name;
@@ -1253,10 +1529,11 @@
                 lawSelectionControls.appendChild(button);
             });
 
-            // --- بارگذاری اولیه برنامه ---
+            // --- Initial App Load ---
             openDatabase().then(async () => {
-                // بارگذاری قانون پیش‌فرض هنگام شروع برنامه
-                await loadLaw(currentLawId); 
+                // Display initial message
+                articlesContainer.innerHTML = '<p class="initial-message">قانون مورد نظر خود را از بالا انتخاب کنید.</p>';
+                document.querySelector('h1').textContent = 'قوانین ایران'; // Reset title
             }).catch(error => {
                 console.error('Failed to open IndexedDB:', error);
                 articlesContainer.innerHTML = `<p class="error">خطا در راه‌اندازی پایگاه داده محلی: ${error.message}</p>`;
