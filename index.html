@@ -491,13 +491,17 @@
                 font-size: 0.8em;
             }
             .article-actions {
-                flex-direction: column; /* آیکون‌ها زیر هم */
-                align-items: flex-end;
+                /* Changed: Keep row direction, allow wrapping */
+                flex-direction: row; 
+                flex-wrap: wrap; 
+                justify-content: flex-end; /* Align to right */
+                gap: 8px; /* Slightly smaller gap for mobile */
             }
             .action-icon {
-                font-size: 1em;
-                width: 100%; /* دکمه‌ها عرض کامل بگیرند */
-                justify-content: flex-end; /* متن و آیکون به راست */
+                /* Removed width: 100% */
+                font-size: 1.1em; /* Slightly smaller font for compactness */
+                padding: 6px; /* Slightly smaller padding */
+                justify-content: center; /* Center icon within its space */
             }
             #scrollToTopBtn {
                 bottom: 15px;
@@ -917,6 +921,9 @@
 
                 console.log("[renderArticles] Articles received for rendering (first 5):", articlesToRender.slice(0, 5).map(a => a.tagName));
 
+                // Use a DocumentFragment for more efficient DOM manipulation
+                const fragment = document.createDocumentFragment();
+
                 for (const articleNode of articlesToRender) {
                     const articleCardDiv = document.createElement('div');
                     articleCardDiv.classList.add('article-card');
@@ -1116,8 +1123,9 @@
                     articleCardDiv.appendChild(actionsDiv);
                     // --- پایان اضافه کردن آیکون‌ها و دکمه کپی ---
 
-                    articlesContainer.appendChild(articleCardDiv);
+                    fragment.appendChild(articleCardDiv); // Append to fragment
                 }
+                articlesContainer.appendChild(fragment); // Append fragment to DOM
             }
 
             /**
