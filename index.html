@@ -3,1566 +3,448 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قوانین ایران</title>
-    <!-- اضافه کردن فونت وزیرمتن از Google Fonts -->
+    <title>سامانه قوانین ایران (نسخه آفلاین)</title>
+    
+    <!-- فونت وزیرمتن -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome برای آیکون‌ها -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
     
-    <!-- اضافه کردن Manifest برای PWA -->
+    <!-- آیکون‌ها (Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="manifest" href="manifest.json">
     
     <style>
-        body {
-            font-family: 'Vazirmatn', 'B Nazanin', 'Arial', sans-serif;
-            line-height: 1.8;
-            margin: 20px;
-            background-color: #f4f4f4;
-            color: #333;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        body.dark-mode {
-            background-color: #222;
-            color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-        body.dark-mode .container {
-            background-color: #333;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-        }
-        h1 {
-            text-align: center;
-            color: #0056b3;
-            margin-bottom: 30px;
-        }
-        body.dark-mode h1 {
-            color: #87ceeb;
-        }
-        .search-container {
-            display: flex;
-            margin-bottom: 20px;
-            gap: 10px;
-            justify-content: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        body.dark-mode .search-container {
-            border-bottom-color: #444;
-        }
-        .search-container input[type="text"] {
-            flex-grow: 1;
-            padding: 10px 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1em;
-            font-family: 'Vazirmatn', 'B Nazanin', 'Arial', sans-serif;
-            text-align: right;
-            background-color: #fff;
-            color: #333;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-        body.dark-mode .search-container input[type="text"] {
-            background-color: #444;
-            color: #f4f4f4;
-            border-color: #666;
-        }
-        .search-container button { /* Style for the new clear search button */
-            padding: 10px 15px;
-            background-color: #dc3545; /* Red for clear button */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            font-family: 'Vazirmatn', 'B Nazanin', 'Arial', sans-serif;
-            transition: background-color 0.3s ease;
-        }
-        .search-container button:hover {
-            background-color: #c82333;
+        /* CSS Variables for Theming */
+        :root {
+            --font-main: 'Vazirmatn', sans-serif;
+
+            --color-bg: #f8f9fa;
+            --color-surface: #ffffff;
+            --color-text-primary: #212529;
+            --color-text-secondary: #6c757d;
+            --color-border: #dee2e6;
+            --color-primary: #0d6efd;
+            --color-primary-hover: #0b5ed7;
+            --color-accent: #6f42c1;
+            --color-highlight-bg: rgba(255, 229, 102, 0.8);
+            --color-highlight-text: #333;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
         }
 
-        /* استایل برای کارت‌های مواد */
-        .article-card {
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-            padding: 20px;
-            position: relative;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        body.dark-mode .article-card {
-            background-color: #3a3a3a;
-            border-color: #555;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        .article-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
-        body.dark-mode .article-card:hover {
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        [data-theme="dark"] {
+            --color-bg: #121212;
+            --color-surface: #1e1e1e;
+            --color-text-primary: #e9ecef;
+            --color-text-secondary: #adb5bd;
+            --color-border: #343a40;
+            --color-primary: #4dabf7;
+            --color-primary-hover: #74c0fc;
+            --color-accent: #c19ee8;
+            --color-highlight-bg: #ffd700;
+            --color-highlight-text: #222;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.3);
         }
 
-        .article-title {
-            font-weight: bold;
-            color: #007bff;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-            border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 8px;
-        }
-        body.dark-mode .article-title {
-            color: #a0d9ff;
-            border-bottom-color: #555;
-        }
-        .article-content {
-            text-align: justify;
-            margin-bottom: 15px;
-        }
-        .loading, .error, .no-results, .initial-message {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.2em;
-            color: #888;
-        }
-        body.dark-mode .loading, body.dark-mode .no-results, body.dark-mode .initial-message {
-            color: #bbb;
-        }
-        body.dark-mode .error {
-            color: #ff6666;
-        }
-        .highlight {
-            background-color: yellow;
-            color: black;
-            padding: 2px 0;
-            border-radius: 3px;
-        }
-        body.dark-mode .highlight {
-            background-color: #ffd700;
-            color: #333;
-        }
-        .controls {
-            display: flex;
-            flex-wrap: wrap; /* برای ریسپانسیو بودن */
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        body.dark-mode .controls {
-            border-bottom-color: #444;
-        }
-        .controls button {
-            padding: 8px 15px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-family: 'Vazirmatn', 'B Nazanin', 'Arial', sans-serif;
-            transition: background-color 0.3s ease;
-        }
-        .controls button:hover {
-            background-color: #5a6268;
-        }
-        .controls button#darkModeToggle {
-            background-color: #28a745;
-        }
-        .controls button#darkModeToggle:hover {
-            background-color: #218838;
-        }
-        body.dark-mode .controls button#darkModeToggle {
-            background-color: #17a2b8;
-        }
-        body.dark-mode .controls button#darkModeToggle:hover {
-            background-color: #138496;
-        }
-        /* استایل برای دکمه نمایش نشان‌گذاری‌ها */
-        .controls button#showBookmarksBtn {
-            background-color: #ffc107; /* رنگ زرد */
-            color: #333;
-            padding: 6px 10px; /* کوچک‌تر کردن پدینگ */
-            font-size: 0.8em; /* کوچک‌تر کردن فونت */
-            border-radius: 15px; /* دکمه گردتر */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .controls button#showBookmarksBtn:hover {
-            background-color: #e0a800;
-        }
-        body.dark-mode .controls button#showBookmarksBtn {
-            background-color: #ffd700;
-            color: #333;
-        }
-        body.dark-mode .controls button#showBookmarksBtn:hover {
-            background-color: #ccac00;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-main); background-color: var(--color-bg); color: var(--color-text-primary); line-height: 1.8; transition: background-color 0.3s, color 0.3s; overflow-x: hidden; }
 
-        /* استایل‌های آیکون‌های نشان‌گذاری و یادداشت و تحلیل و کپی */
-        .article-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end; /* قرار دادن دکمه‌ها در سمت چپ (در RTL) */
-            margin-top: 10px;
-        }
-        .action-icon {
-            cursor: pointer;
-            color: #888;
-            font-size: 1.2em;
-            transition: color 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center; /* برای وسط چین کردن آیکون */
-            padding: 8px; /* پدینگ برای آیکون تنها */
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            position: relative; /* برای positioning feedback */
-        }
-        .action-icon i {
-            margin: 0; /* اطمینان از عدم وجود حاشیه اضافی روی خود آیکون */
-        }
-        .action-icon:hover {
-            color: #007bff;
-            background-color: #e9ecef;
-        }
-        .action-icon.bookmarked {
-            color: #ffc107; /* رنگ زرد برای نشان‌گذاری شده */
-        }
-        .action-icon.has-note {
-            color: #28a745; /* رنگ سبز برای یادداشت‌دار */
-        }
-        body.dark-mode .action-icon {
-            color: #bbb;
-            background-color: #555;
-        }
-        body.dark-mode .action-icon:hover {
-            color: #a0d9ff;
-            background-color: #666;
-        }
-        body.dark-mode .action-icon.bookmarked {
-            color: #ffd700;
-        }
-        body.dark-mode .action-icon.has-note {
-            color: #90ee90;
-        }
-        .action-icon.analysis-icon { /* استایل برای آیکون تحلیل */
-            color: #6f42c1; /* رنگ بنفش */
-        }
-        body.dark-mode .action-icon.analysis-icon {
-            color: #e6b3ff; /* بنفش روشن‌تر برای حالت تاریک */
-        }
-        .action-icon.copy-icon {
-            background-color: #17a2b8; /* آبی فیروزه‌ای برای کپی */
-            color: white;
-        }
-        .action-icon.copy-icon:hover {
-            background-color: #138496;
-            color: white;
-        }
-        .copy-feedback {
-            position: absolute;
-            top: -25px; /* Adjust as needed */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #28a745;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            pointer-events: none; /* Make it unclickable */
-            z-index: 10; /* Ensure it's above other elements */
-        }
-        .copy-feedback.show {
-            opacity: 1;
-        }
+        /* --- Main Layout --- */
+        .app-layout { display: grid; grid-template-columns: 280px 1fr; grid-template-rows: auto 1fr; grid-template-areas: "header header" "sidebar main"; height: 100vh; }
+        @media (max-width: 992px) { .app-layout { grid-template-columns: 1fr; grid-template-areas: "header" "main"; } }
 
-        /* استایل‌های مودال‌ها (یادداشت‌نویسی و تحلیل) */
-        .modal {
-            display: none; /* مخفی کردن پیش‌فرض */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6); /* پس‌زمینه نیمه‌شفاف */
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 800px; /* Increased max-width for analysis modal */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-            animation: fadeIn 0.3s;
-        }
-        body.dark-mode .modal-content {
-            background-color: #444;
-            color: #f4f4f4;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        body.dark-mode .modal-header {
-            border-bottom-color: #666;
-        }
-        .modal-header h2 {
-            margin: 0;
-            color: #0056b3;
-            font-size: 1.3em;
-        }
-        body.dark-mode .modal-header h2 {
-            color: #87ceeb;
-        }
-        .modal-body { /* Changed from .modal-body textarea, .modal-body .analysis-content-display */
-            max-height: 70vh; /* Set max height for scrollability */
-            overflow-y: auto; /* Enable vertical scrolling */
-            padding: 10px; /* Add padding to the scrollable area */
-        }
-        .modal-body textarea {
-            width: calc(100% - 20px); /* Adjust width for padding */
-            min-height: 150px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-family: 'Vazirmatn', 'B Nazanin', 'Arial', sans-serif;
-            font-size: 1em;
-            resize: vertical; /* اجازه تغییر اندازه عمودی */
-            direction: rtl; /* راست‌چین کردن متن در textarea */
-            text-align: right;
-            background-color: #fff;
-            color: #333;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-        body.dark-mode .modal-body textarea {
-            background-color: #555;
-            color: #f4f4f4;
-            border-color: #777;
-        }
-        .modal-body .analysis-content-display {
-            width: 100%; /* Ensure it takes full width of its container */
-            white-space: pre-wrap; /* حفظ فرمت‌بندی متن (مثلاً خطوط جدید) */
-            /* Removed overflow-y and max-height from here as it's now on .modal-body */
-            border: none; /* حذف border برای نمایش محتوا */
-            background-color: transparent; /* حذف پس‌زمینه برای نمایش محتوا */
-            padding: 0; /* حذف پدینگ برای نمایش محتوا */
-            color: #333; /* Ensure text color is consistent */
-        }
-        body.dark-mode .modal-body .analysis-content-display {
-            color: #f4f4f4;
-        }
-        /* Removed .analysis-warning as requested */
-        .analysis-section-title {
-            font-weight: bold;
-            color: #0056b3;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            font-size: 1.1em; /* Slightly larger for titles */
-        }
-        body.dark-mode .analysis-section-title {
-            color: #87ceeb;
-            border-bottom-color: #666;
-        }
-        .analysis-list {
-            list-style-type: disc; /* دایره‌ای برای لیست‌ها */
-            padding-right: 20px; /* برای نمایش گلوله‌ها */
-            margin-bottom: 10px;
-            line-height: 1.6; /* Better line spacing for lists */
-        }
-        .analysis-list li {
-            margin-bottom: 5px;
-        }
-        .loading-analysis {
-            text-align: center;
-            font-style: italic;
-            color: #888;
-        }
-        body.dark-mode .loading-analysis {
-            color: #bbb;
-        }
+        /* --- Header --- */
+        .app-header { grid-area: header; background-color: var(--color-surface); padding: 1rem 1.5rem; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); z-index: 100; }
+        .app-header .logo { font-size: 1.5rem; font-weight: 700; color: var(--color-primary); }
+        .header-controls { display: flex; align-items: center; gap: 1rem; }
+        .law-selector { padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--color-border); background-color: var(--color-bg); color: var(--color-text-primary); font-family: var(--font-main); font-size: 1rem; cursor: pointer; }
 
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .modal-footer button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Vazirmatn', 'B Nazanin', 'Arial', sans-serif;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-        }
-        .modal-footer .save-button {
-            background-color: #007bff;
-            color: white;
-        }
-        .modal-footer .save-button:hover {
-            background-color: #0056b3;
-        }
-        .modal-footer .cancel-button {
-            background-color: #dc3545;
-            color: white;
-        }
-        .modal-footer .cancel-button:hover {
-            background-color: #c82333;
-        }
+        /* --- Sidebar --- */
+        .sidebar { grid-area: sidebar; background-color: var(--color-surface); border-left: 1px solid var(--color-border); padding: 1.5rem; overflow-y: auto; transition: transform 0.3s ease; }
+        .sidebar-header { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--color-border); }
+        #navigationTree { list-style: none; padding-right: 0; }
+        #navigationTree .nav-item { font-weight: 500; cursor: pointer; padding: 0.5rem 0.8rem; border-radius: 6px; transition: background-color 0.2s; margin-bottom: 0.25rem; color: var(--color-text-secondary); }
+        #navigationTree .nav-item:hover { background-color: var(--color-bg); color: var(--color-text-primary); }
+        #navigationTree .nav-item.active { background-color: var(--color-primary); color: white; font-weight: 700; }
+        #navigationTree .nav-children { padding-right: 1.5rem; border-right: 2px solid var(--color-border); margin-right: 0.5rem; }
+        @media (max-width: 992px) { .sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 280px; transform: translateX(100%); z-index: 1001; box-shadow: var(--shadow-md); } .sidebar.open { transform: translateX(0); } }
 
-        /* انیمیشن برای نمایش مودال */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* --- Main Content --- */
+        .main-content { grid-area: main; overflow-y: auto; padding: 2rem; }
+        .search-and-filters { display: flex; gap: 1rem; margin-bottom: 2rem; align-items: center; }
+        .search-box { position: relative; flex-grow: 1; }
+        .search-box .fa-search { position: absolute; top: 50%; right: 1rem; transform: translateY(-50%); color: var(--color-text-secondary); }
+        #searchInput { width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--color-border); font-size: 1rem; font-family: var(--font-main); background-color: var(--color-surface); color: var(--color-text-primary); }
+        .icon-button { background: none; border: 1px solid var(--color-border); color: var(--color-text-secondary); width: 45px; height: 45px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .icon-button:hover { background-color: var(--color-bg); color: var(--color-text-primary); }
+        .icon-button.active { background-color: var(--color-accent); color: white; border-color: var(--color-accent); }
 
-        /* دکمه رفتن به بالای صفحه */
-        #scrollToTopBtn {
-            display: none; /* مخفی کردن پیش‌فرض */
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 99;
-            border: none;
-            outline: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            padding: 15px;
-            border-radius: 50%; /* دایره‌ای */
-            font-size: 1.5em;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: background-color 0.3s, opacity 0.3s;
-        }
-        #scrollToTopBtn:hover {
-            background-color: #0056b3;
-        }
-        body.dark-mode #scrollToTopBtn {
-            background-color: #17a2b8;
-        }
-        body.dark-mode #scrollToTopBtn:hover {
-            background-color: #138496;
-        }
+        /* --- Article Cards --- */
+        .article-card { background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; padding: 1.5rem; transition: box-shadow 0.3s, transform 0.3s; }
+        .article-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+        .article-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .article-title { font-size: 1.5rem; font-weight: 700; color: var(--color-primary); }
+        .article-actions { display: flex; gap: 0.75rem; }
+        .article-actions .action-icon { background-color: var(--color-bg); border: 1px solid var(--color-border); width: 40px; height: 40px; border-radius: 50%; font-size: 1rem; }
+        .article-actions .action-icon.bookmarked { background-color: #ffc107; color: #333; border-color: #ffc107; }
+        .article-actions .action-icon.has-note { background-color: #198754; color: white; border-color: #198754; }
+        .article-content { text-align: justify; }
+        .highlight { background-color: var(--color-highlight-bg); color: var(--color-highlight-text); padding: 2px 4px; border-radius: 4px; }
 
-        /* ریسپانسیو بودن برای موبایل */
-        @media (max-width: 600px) {
-            .container {
-                margin: 10px;
-                padding: 15px;
-            }
-            .search-container {
-                flex-direction: column; /* دکمه جستجو و پاک کردن زیر هم */
-                align-items: stretch;
-            }
-            .search-container input[type="text"] {
-                margin-bottom: 10px;
-            }
-            .controls button {
-                padding: 6px 10px;
-                font-size: 0.8em;
-            }
-            .article-actions {
-                /* Changed: Keep row direction, allow wrapping */
-                flex-direction: row; 
-                flex-wrap: wrap; 
-                justify-content: flex-end; /* Align to right */
-                gap: 8px; /* Slightly smaller gap for mobile */
-            }
-            .action-icon {
-                /* Removed width: 100% */
-                font-size: 1.1em; /* Slightly smaller font for compactness */
-                padding: 6px; /* Slightly smaller padding */
-                justify-content: center; /* Center icon within its space */
-            }
-            #scrollToTopBtn {
-                bottom: 15px;
-                right: 15px;
-                padding: 10px;
-                font-size: 1.2em;
-            }
-            .modal-content {
-                width: 95%;
-                padding: 15px;
-            }
-            .law-selection-controls button {
-                width: calc(50% - 10px); /* دو دکمه در هر ردیف */
-            }
-        }
-        /* استایل برای دکمه‌های انتخاب قانون */
-        .law-selection-controls {
-            display: flex;
-            flex-wrap: wrap; /* برای ریسپانسیو بودن و شکستن خط در صفحات کوچک */
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        body.dark-mode .law-selection-controls {
-            border-bottom-color: #444;
-        }
-        .law-selection-controls button {
-            padding: 8px 15px;
-            background-color: #007bff; /* آبی برای دکمه‌های قانون */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-family: 'Vazirmatn', 'B Nazanin', 'Arial', sans-serif;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .law-selection-controls button:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px); /* افکت کوچک هنگام هاور */
-        }
-        .law-selection-controls button.active-law {
-            background-color: #28a745; /* سبز برای قانون فعال */
-            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
-            cursor: default; /* تغییر نشانگر ماوس */
-            pointer-events: none; /* غیرفعال کردن کلیک */
-        }
-        .law-selection-controls button.disabled-for-delay {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        body.dark-mode .law-selection-controls button {
-            background-color: #17a2b8; /* آبی روشن‌تر در حالت تاریک */
-        }
-        body.dark-mode .law-selection-controls button:hover {
-            background-color: #138496;
-        }
-        body.dark-mode .law-selection-controls button.active-law {
-            background-color: #90ee90; /* سبز روشن‌تر در حالت تاریک */
-            color: #333;
-            box-shadow: 0 0 8px rgba(144, 238, 144, 0.5);
-        }
-        /* New style for countdown message container */
-        .countdown-message-container {
-            text-align: center;
-            margin-top: 10px;
-            font-weight: bold;
-            color: #0056b3; /* A noticeable color */
-            min-height: 20px; /* To prevent layout shift when message appears/disappears */
-            font-size: 1em;
-        }
-        body.dark-mode .countdown-message-container {
-            color: #87ceeb;
-        }
+        /* --- Modals --- */
+        .modal { display: none; position: fixed; z-index: 1010; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background-color: var(--color-surface); padding: 2rem; border-radius: 12px; width: 90%; max-width: 700px; box-shadow: var(--shadow-md); position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--color-border); }
+        .modal-header h2 { font-size: 1.5rem; color: var(--color-primary); }
+        .modal-body { max-height: 70vh; overflow-y: auto; }
+        .modal-body textarea, .modal-body .analysis-content-display { width: 100%; font-family: var(--font-main); font-size: 1rem; min-height: 200px; padding: 1rem; border: 1px solid var(--color-border); border-radius: 8px; background-color: var(--color-bg); color: var(--color-text-primary); resize: vertical; }
+        .modal-footer { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem; }
+        .modal-footer button { padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 1rem; font-family: var(--font-main); font-weight: 500; cursor: pointer; border: none; transition: opacity 0.2s; }
+        .modal-footer button:hover { opacity: 0.85; }
+        .modal-footer .save-btn { background-color: var(--color-primary); color: white; }
+        .modal-footer .cancel-btn { background-color: var(--color-text-secondary); color: white; }
+
+        /* --- Analysis Modal Styles --- */
+        #analysisContentDisplay { white-space: pre-wrap; }
+        #analysisContentDisplay h3 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--color-accent); border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;}
+        #analysisContentDisplay ul { padding-right: 20px; }
+        .example-box, .related-article { background-color: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .example-box h4 { font-weight: 500; color: var(--color-text-secondary); margin-bottom: 0.25rem; }
+
+        /* --- Utility & State Classes --- */
+        .status-message { text-align: center; padding: 4rem; font-size: 1.2rem; color: var(--color-text-secondary); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 1000; }
+        .overlay.show { display: block; }
+
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>قوانین ایران</h1>
+<body data-theme="light">
 
-        <!-- بخش انتخاب قوانین -->
-        <div id="lawSelectionControls" class="law-selection-controls">
-            <!-- دکمه‌های قوانین اینجا به صورت پویا اضافه می‌شوند -->
-        </div>
-        <!-- New: Container for countdown message -->
-        <div id="countdownMessageContainer" class="countdown-message-container">
-            <!-- Countdown message will appear here -->
-        </div>
+    <div class="app-layout">
+        <header class="app-header">
+            <div class="logo">سامانه قوانین</div>
+            <div class="header-controls">
+                <select id="lawSelector" class="law-selector"></select>
+                <button class="icon-button" id="darkModeToggle" title="تغییر تم"><i class="fas fa-moon"></i></button>
+                <button class="icon-button d-lg-none" id="menuToggle" title="فهرست"><i class="fas fa-bars"></i></button>
+            </div>
+        </header>
 
-        <div class="controls">
-            <button id="darkModeToggle">حالت تاریک</button>
-            <button id="showBookmarksBtn" title="نمایش مواد نشان‌گذاری شده">
-                <i class="fas fa-bookmark"></i>
-            </button>
-        </div>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">فهرست قانون</div>
+            <div id="navigationTreeContainer"><p class="status-message">قانونی انتخاب نشده است.</p></div>
+        </aside>
 
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="جستجو در مواد قانون فعلی..." dir="rtl">
-            <button id="clearSearchButton">پاک کردن</button>
-        </div>
-
-        <div id="articles-container">
-            <!-- پیام اولیه یا مواد قانون اینجا نمایش داده می‌شوند -->
-            <p class="initial-message">قانون مورد نظر خود را از بالا انتخاب کنید.</p>
-        </div>
+        <main class="main-content" id="mainContent">
+            <div class="search-and-filters">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="جستجو در قانون فعلی...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <button class="icon-button" id="showBookmarksBtn" title="نمایش نشان‌شده‌ها"><i class="fas fa-bookmark"></i></button>
+            </div>
+            <div id="articles-container"><p class="status-message">برای شروع، یک قانون را از منوی بالا انتخاب کنید.</p></div>
+        </main>
     </div>
 
-    <!-- مودال یادداشت‌نویسی -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Note Modal -->
     <div id="noteModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="noteModalArticleTitle"></h2>
-                <span class="close-button" data-modal-id="noteModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <textarea id="noteTextarea" placeholder="یادداشت خود را اینجا بنویسید..." dir="rtl"></textarea>
-            </div>
-            <div class="modal-footer">
-                <button class="save-button" id="saveNoteButton">ذخیره یادداشت</button>
-                <button class="cancel-button" data-modal-id="noteModal">بستن</button>
-            </div>
+            <div class="modal-header"><h2 id="noteModalArticleTitle">یادداشت</h2><button class="icon-button" data-close-modal="noteModal">&times;</button></div>
+            <div class="modal-body"><textarea id="noteTextarea" placeholder="یادداشت خود را اینجا بنویسید..."></textarea></div>
+            <div class="modal-footer"><button class="save-btn" id="saveNoteButton">ذخیره</button><button class="cancel-btn" data-close-modal="noteModal">انصراف</button></div>
         </div>
     </div>
 
-    <!-- مودال تحلیل و نظر مشورتی -->
+    <!-- Analysis Modal -->
     <div id="analysisModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="analysisModalArticleTitle"></h2>
-                <span class="close-button" data-modal-id="analysisModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div id="analysisContentDisplay" class="analysis-content-display" dir="rtl">
-                    <!-- محتوای تحلیل اینجا بارگذاری می‌شود -->
-                    <p class="loading-analysis">در حال تولید تحلیل...</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="cancel-button" data-modal-id="analysisModal">بستن</button>
-            </div>
+            <div class="modal-header"><h2 id="analysisModalArticleTitle">تحلیل ماده</h2><button class="icon-button" data-close-modal="analysisModal">&times;</button></div>
+            <div class="modal-body"><div id="analysisContentDisplay" class="analysis-content-display"></div></div>
+            <div class="modal-footer"><button class="cancel-btn" data-close-modal="analysisModal">بستن</button></div>
         </div>
     </div>
 
-    <!-- دکمه رفتن به بالای صفحه -->
-    <button id="scrollToTopBtn" title="برو به بالا">
-        <i class="fas fa-arrow-up"></i>
-    </button>
 
-    <!-- کتابخانه LZ-String برای فشرده‌سازی -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const baseGithubUrl = 'https://raw.githubusercontent.com/amirbay1/gh/refs/heads/main/'; // مسیر پایه
-            const articlesContainer = document.getElementById('articles-container');
-            const searchInput = document.getElementById('searchInput');
-            const clearSearchButton = document.getElementById('clearSearchButton'); 
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const showBookmarksBtn = document.getElementById('showBookmarksBtn');
-            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-            const lawSelectionControls = document.getElementById('lawSelectionControls');
-            const countdownMessageContainer = document.getElementById('countdownMessageContainer'); // New: Get countdown message container
+    document.addEventListener('DOMContentLoaded', () => {
 
-            // عناصر مودال یادداشت
-            const noteModal = document.getElementById('noteModal');
-            const noteModalArticleTitle = document.getElementById('noteModalArticleTitle');
-            const noteTextarea = document.getElementById('noteTextarea');
-            const saveNoteButton = document.getElementById('saveNoteButton');
-
-            // عناصر مودال تحلیل
-            const analysisModal = document.getElementById('analysisModal');
-            const analysisModalArticleTitle = document.getElementById('analysisModalArticleTitle');
-            const analysisContentDisplay = document.getElementById('analysisContentDisplay');
-
-            // دکمه‌های بستن مودال‌ها
-            document.querySelectorAll('.close-button, .modal-footer .cancel-button').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const modalId = event.target.dataset.modalId;
-                    if (modalId) {
-                        document.getElementById(modalId).style.display = 'none';
-                    }
-                });
-            });
-
-            let allArticles = []; // برای ذخیره تمام مواد قانون پس از بارگذاری و مرتب‌سازی
-            let currentArticleId = null; // برای نگهداری شناسه ماده‌ای که در حال ویرایش یادداشت/تحلیل آن هستیم
-            let currentLawId = null; // قانون پیش‌فرض: هیچ قانونی انتخاب نشده
-
-            // وضعیت بارگذاری قوانین (برای مدیریت کش)
-            // 'not_loaded': هنوز بارگذاری نشده
-            // 'first_loaded': یک بار بارگذاری شده (چه از کش، چه از گیت‌هاب)
-            let loadedLawsStatus = {}; 
-
-            // وضعیت فعال بودن دکمه‌های قانون (برای مدیریت تأخیر)
-            let isLawButtonClickable = true;
-            let lawButtonTimeoutId = null;
-            let countdownIntervalId = null; // New: To manage countdown interval
-
-            // پیکربندی قوانین (مسیر فایل‌ها اصلاح شد)
-            const lawConfigs = [
+        const config = {
+            baseGithubUrl: 'https://raw.githubusercontent.com/amirbay1/gh/refs/heads/main/',
+            laws: [
                 { id: 'madani', name: 'قانون مدنی', fileName: 'madani/madani.xml' },
                 { id: 'shora', name: 'قانون شوراها', fileName: 'shora/shora.xml' },
                 { id: 'adk', name: 'آیین دادرسی کیفری', fileName: 'adk/adk.xml' },
                 { id: 'adm', name: 'آیین دادرسی مدنی', fileName: 'adm/adm.xml' },
                 { id: 'tej', name: 'قانون تجارت', fileName: 'tej/tej.xml' },
                 { id: 'jaza', name: 'قانون جزا', fileName: 'jaza/jaza.xml' },
-            ];
+            ],
+            db: { name: 'IranLawsDB_v2', version: 1, stores: { metadata: 'metadata', xmlCache: 'xmlCache', analysisCache: 'analysisCache' } }
+        };
+        const ui = {
+            lawSelector: document.getElementById('lawSelector'),
+            articlesContainer: document.getElementById('articles-container'),
+            navigationTreeContainer: document.getElementById('navigationTreeContainer'),
+            searchInput: document.getElementById('searchInput'),
+            darkModeToggle: document.getElementById('darkModeToggle'),
+            showBookmarksBtn: document.getElementById('showBookmarksBtn'),
+            sidebar: document.getElementById('sidebar'),
+            menuToggle: document.getElementById('menuToggle'),
+            overlay: document.getElementById('overlay'),
+            mainContent: document.getElementById('mainContent'),
+            noteModal: document.getElementById('noteModal'),
+            noteModalTitle: document.getElementById('noteModalArticleTitle'),
+            noteTextarea: document.getElementById('noteTextarea'),
+            saveNoteBtn: document.getElementById('saveNoteButton'),
+            analysisModal: document.getElementById('analysisModal'),
+            analysisModalTitle: document.getElementById('analysisModalArticleTitle'),
+            analysisContent: document.getElementById('analysisContentDisplay'),
+        };
+        const state = { currentLawId: null, allArticles: [], articleMap: new Map(), currentLawXml: null, db: null, activeModal: null, currentArticleId: null, isFilterActive: { bookmarks: false } };
 
-            // --- IndexedDB Setup ---
-            const DB_NAME = 'CivilCodeDB';
-            const STORE_NAME = 'ArticleData'; // برای نشان‌گذاری و یادداشت
-            const XML_STORE_NAME = 'FullXmlContent'; // برای ذخیره کل XML
-            const ANALYSIS_STORE_NAME = 'ArticleAnalyses'; // برای ذخیره تحلیل‌ها
-
-            let db;
-
-            /**
-             * Opens or creates the IndexedDB database.
-             * @returns {Promise<IDBDatabase>} A promise that resolves with the database object.
-             */
-            function openDatabase() {
+        const Database = {
+            async open() {
                 return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(DB_NAME, 2); 
-
-                    request.onupgradeneeded = (event) => {
-                        db = event.target.result;
-                        if (!db.objectStoreNames.contains(STORE_NAME)) {
-                            db.createObjectStore(STORE_NAME, { keyPath: 'id' }); 
-                        }
-                        if (!db.objectStoreNames.contains(XML_STORE_NAME)) {
-                            db.createObjectStore(XML_STORE_NAME, { keyPath: 'id' }); 
-                        }
-                        if (!db.objectStoreNames.contains(ANALYSIS_STORE_NAME)) {
-                            db.createObjectStore(ANALYSIS_STORE_NAME, { keyPath: 'id' }); 
-                        }
-                    };
-
-                    request.onsuccess = (event) => {
-                        db = event.target.result;
-                        resolve(db);
-                    };
-
-                    request.onerror = (event) => {
-                        console.error('IndexedDB error:', event.target.errorCode);
-                        reject('Error opening IndexedDB');
-                    };
+                    const request = indexedDB.open(config.db.name, config.db.version);
+                    request.onupgradeneeded = e => { const db = e.target.result; Object.values(config.db.stores).forEach(storeName => { if (!db.objectStoreNames.contains(storeName)) { db.createObjectStore(storeName, { keyPath: 'id' }); } }); };
+                    request.onsuccess = e => resolve(e.target.result);
+                    request.onerror = e => reject(e.target.error);
                 });
-            }
-
+            },
+            async get(storeName, id) { if (!state.db) state.db = await this.open(); return new Promise((resolve, reject) => { const tx = state.db.transaction(storeName, 'readonly'); const store = tx.objectStore(storeName); const request = store.get(id); request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); },
+            async put(storeName, data) { if (!state.db) state.db = await this.open(); return new Promise((resolve, reject) => { const tx = state.db.transaction(storeName, 'readwrite'); const store = tx.objectStore(storeName); const request = store.put(data); request.onsuccess = () => resolve(); request.onerror = () => reject(request.error); }); }
+        };
+        
+        const API = {
+            async fetchWithBackoff(url, retries = 3, delay = 1000) { for (let i = 0; i < retries; i++) { try { const response = await fetch(url); if (response.ok) return response; await new Promise(res => setTimeout(res, delay)); delay *= 2; } catch (error) { if (i === retries - 1) throw error; } } throw new Error('Max retries exceeded.'); },
+            async getLawXml(lawId) {
+                const law = config.laws.find(l => l.id === lawId);
+                const cacheKey = `xml_${lawId}`;
+                const cached = await Database.get(config.db.stores.xmlCache, cacheKey);
+                if (cached) { console.log(`XML for ${lawId} loaded from cache.`); return LZString.decompressFromUTF16(cached.data); }
+                console.log(`Fetching XML for ${lawId} from network.`);
+                const url = config.baseGithubUrl + law.fileName;
+                const response = await this.fetchWithBackoff(url);
+                const xmlString = await response.text();
+                const compressed = LZString.compressToUTF16(xmlString);
+                await Database.put(config.db.stores.xmlCache, { id: cacheKey, data: compressed });
+                return xmlString;
+            },
+            
             /**
-             * Retrieves data from a specified IndexedDB object store.
-             * @param {string} storeName - The name of the object store.
-             * @param {string} id - The key of the data to retrieve.
-             * @returns {Promise<any>} A promise that resolves with the retrieved data.
+             * Calls the Gemini API directly.
+             * This is ONLY safe for local/offline use. DO NOT use this code on a public website.
              */
-            async function getDataFromStore(storeName, id) {
-                if (!db) await openDatabase();
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readonly');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.get(id);
-
-                    request.onsuccess = () => {
-                        resolve(request.result);
-                    };
-
-                    request.onerror = (event) => {
-                        console.error(`Error getting data from ${storeName}:`, event.target.errorCode);
-                        reject(event.target.errorCode);
-                    };
-                });
-            }
-
-            /**
-             * Stores data in a specified IndexedDB object store.
-             * @param {string} storeName - The name of the object store.
-             * @param {object} data - The data object to store (must have a keyPath property).
-             * @returns {Promise<void>} A promise that resolves when the data is stored.
-             */
-            async function putDataIntoStore(storeName, data) {
-                if (!db) await openDatabase();
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.put(data);
-
-                    request.onsuccess = () => resolve();
-                    request.onerror = (event) => {
-                        console.error(`Error putting data into ${storeName}:`, event.target.errorCode);
-                        reject(event.target.errorCode);
-                    };
-                });
-            }
-
-            /**
-             * Retrieves metadata (bookmark, note) for a specific article.
-             * @param {string} articleId - The ID of the article (e.g., "ماده_1").
-             * @returns {Promise<object>} An object containing metadata.
-             */
-            async function getArticleMetadata(articleId) {
-                const compositeId = `${currentLawId}_${articleId}`;
-                const data = await getDataFromStore(STORE_NAME, compositeId);
-                if (data && data.note) {
-                    data.note = LZString.decompressFromUTF16(data.note);
-                }
-                return data || { id: compositeId, bookmarked: false, note: '' };
-            }
-
-            /**
-             * Saves metadata (bookmark, note) for a specific article.
-             * @param {string} articleId - The ID of the article.
-             * @param {object} data - The metadata object to save.
-             * @returns {Promise<void>}
-             */
-            async function saveArticleMetadata(articleId, data) {
-                const compositeId = `${currentLawId}_${articleId}`;
-                data.id = compositeId; 
-                if (data.note) {
-                    data.note = LZString.compressToUTF16(data.note);
-                } else {
-                    data.note = '';
-                }
-                await putDataIntoStore(STORE_NAME, data);
-            }
-
-            /**
-             * Retrieves AI-generated analysis for a specific article.
-             * @param {string} articleId - The ID of the article.
-             * @returns {Promise<object|null>} The analysis content or null if not found.
-             */
-            async function getArticleAnalysis(articleId) {
-                const compositeId = `${currentLawId}_${articleId}`;
-                const data = await getDataFromStore(ANALYSIS_STORE_NAME, compositeId);
-                if (data && data.content) {
-                    return JSON.parse(LZString.decompressFromUTF16(data.content));
-                }
-                return null;
-            }
-
-            /**
-             * Saves AI-generated analysis for a specific article.
-             * @param {string} articleId - The ID of the article.
-             * @param {object} analysisContent - The analysis content object to save.
-             * @returns {Promise<void>}
-             */
-            async function saveArticleAnalysis(articleId, analysisContent) {
-                const compositeId = `${currentLawId}_${articleId}`;
-                const compressedContent = LZString.compressToUTF16(JSON.stringify(analysisContent));
-                await putDataIntoStore(ANALYSIS_STORE_NAME, { id: compositeId, content: compressedContent });
-            }
-
-            /**
-             * Fetches data from a URL with exponential backoff for retries.
-             * @param {string} url - The URL to fetch.
-             * @param {object} options - Fetch options.
-             * @param {number} retries - Number of retries.
-             * @param {number} delay - Initial delay in ms.
-             * @returns {Promise<Response>} The fetch response.
-             * @throws {Error} If fetch fails after all retries.
-             */
-            async function exponentialBackoffFetch(url, options, retries = 3, delay = 1000) {
-                for (let i = 0; i < retries; i++) {
-                    try {
-                        const response = await fetch(url, options);
-                        if (response.ok) {
-                            return response;
-                        } else if (response.status === 429 || response.status >= 500) { 
-                            console.warn(`Retry ${i + 1}/${retries} for ${url}. Status: ${response.status}. Retrying in ${delay / 1000}ms...`);
-                            await new Promise(res => setTimeout(res, delay));
-                            delay *= 2; 
-                        } else {
-                            const errorText = await response.text();
-                            throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
-                        }
-                    } catch (error) {
-                        if (i === retries - 1) {
-                            throw error; 
-                        }
-                        console.warn(`Fetch error: ${error.message}. Retrying in ${delay / 1000}ms...`);
-                        await new Promise(res => setTimeout(res, delay));
-                        delay *= 2;
-                    }
-                }
-                throw new Error('Max retries exceeded for fetch operation.');
-            }
-
-            /**
-             * Creates a span element with an icon for action buttons.
-             * @param {string} iconClass - The Font Awesome icon class (e.g., 'fa-bookmark').
-             * @param {string} title - The title for the icon (for tooltip/accessibility).
-             * @returns {HTMLSpanElement} The created span element.
-             */
-            const createActionIconSpan = (iconClass, title) => {
-                const span = document.createElement('span');
-                span.classList.add('action-icon');
-                span.title = title;
-                const icon = document.createElement('i');
-                icon.classList.add('fas', iconClass);
-                span.appendChild(icon);
-                return span;
-            };
-
-            /**
-             * Renders a list of articles into the articles container.
-             * @param {Array<Node>} articlesToRender - An array of XML article nodes to render.
-             * @param {string} [query=''] - The search query for highlighting.
-             */
-            async function renderArticles(articlesToRender, query = '') {
-                articlesContainer.innerHTML = ''; 
-
-                if (articlesToRender.length === 0) {
-                    articlesContainer.innerHTML = '<p class="no-results">نتیجه‌ای یافت نشد.</p>';
-                    return;
-                }
-
-                console.log("[renderArticles] Articles received for rendering (first 5):", articlesToRender.slice(0, 5).map(a => a.tagName));
-
-                // Use a DocumentFragment for more efficient DOM manipulation
-                const fragment = document.createDocumentFragment();
-
-                for (const articleNode of articlesToRender) {
-                    const articleCardDiv = document.createElement('div');
-                    articleCardDiv.classList.add('article-card');
-                    
-                    const articleId = articleNode.tagName; 
-                    articleCardDiv.dataset.articleId = articleId;
-
-                    const savedMetadata = await getArticleMetadata(articleId);
-
-                    const articleTitleDiv = document.createElement('div');
-                    articleTitleDiv.classList.add('article-title');
-                    let titleText = articleNode.tagName.replace('ماده_', 'ماده ');
-                    // Handle 'مکرر' parts for article titles
-                    if (titleText.includes('_')) {
-                        titleText = titleText.replace('_', ' مکرر ');
-                    }
-                    articleTitleDiv.textContent = titleText;
-                    articleCardDiv.appendChild(articleTitleDiv);
-
-                    const articleContentDiv = document.createElement('div');
-                    articleContentDiv.classList.add('article-content');
-                    let contentHtml = articleNode.textContent.trim().replace(/\n/g, '<br>');
-
-                    if (query && query.length > 0) {
-                        const queryWords = normalizePersianText(query).split(/\s+/).filter(word => word.length > 0);
-                        queryWords.forEach(word => {
-                            const regex = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'); 
-                            contentHtml = contentHtml.replace(regex, '<span class="highlight">$&</span>');
-                        });
-                    }
-                    
-                    articleContentDiv.innerHTML = contentHtml;
-                    articleCardDiv.appendChild(articleContentDiv);
-
-                    // --- اضافه کردن آیکون‌ها و دکمه کپی ---
-                    const actionsDiv = document.createElement('div');
-                    actionsDiv.classList.add('article-actions');
-
-                    // آیکون نشان‌گذاری
-                    const bookmarkIcon = createActionIconSpan('fa-bookmark', 'نشان‌گذاری');
-                    if (savedMetadata.bookmarked) {
-                        bookmarkIcon.classList.add('bookmarked');
-                    }
-                    bookmarkIcon.addEventListener('click', async () => {
-                        savedMetadata.bookmarked = !savedMetadata.bookmarked;
-                        await saveArticleMetadata(articleId, savedMetadata);
-                        bookmarkIcon.classList.toggle('bookmarked', savedMetadata.bookmarked);
-                        if (showBookmarksBtn.classList.contains('active-filter')) {
-                            filterBookmarks();
-                        }
-                    });
-                    actionsDiv.appendChild(bookmarkIcon);
-
-                    // آیکون یادداشت
-                    const noteIcon = createActionIconSpan('fa-sticky-note', 'یادداشت');
-                    if (savedMetadata.note && savedMetadata.note.length > 0) {
-                        noteIcon.classList.add('has-note');
-                    }
-                    noteIcon.addEventListener('click', async () => {
-                        currentArticleId = articleId;
-                        noteModalArticleTitle.textContent = `یادداشت برای ${titleText}`;
-                        const data = await getArticleMetadata(articleId);
-                        noteTextarea.value = data.note || '';
-                        noteModal.style.display = 'flex';
-                    });
-                    actionsDiv.appendChild(noteIcon);
-
-                    // آیکون تحلیل و نظر مشورتی
-                    const analysisIcon = createActionIconSpan('fa-balance-scale', 'تحلیل و نظر مشورتی');
-                    analysisIcon.classList.add('analysis-icon'); 
-                    analysisIcon.addEventListener('click', async () => {
-                        currentArticleId = articleId;
-                        analysisModalArticleTitle.textContent = `تحلیل و نظر مشورتی برای ${titleText}`;
-                        analysisModal.style.display = 'flex'; 
-
-                        const cachedAnalysis = await getArticleAnalysis(articleId);
-                        if (cachedAnalysis) {
-                            console.log(`تحلیل برای ${articleId} از IndexedDB بارگذاری شد.`);
-                            displayAnalysisContent(cachedAnalysis);
-                            return;
-                        }
-
-                        analysisContentDisplay.innerHTML = '<p class="loading-analysis">در حال تولید تحلیل...</p>'; 
-
-                        try {
-                            const articleContent = articleNode.textContent.trim();
-                            const prompt = `ماده قانونی زیر را تحلیل کنید، نظرات مشورتی ارائه دهید، نکات کلیدی آن را بیان کنید و در صورت امکان مثال‌هایی برای درک بهتر ارائه دهید. پاسخ باید به زبان فارسی و با رعایت ساختار حقوقی باشد.
-                            
-                            ماده: ${articleContent}
-                            
-                            پاسخ را در قالب JSON با فیلدهای زیر ارائه دهید:
-                            {
-                                "analysis": "تحلیل کامل ماده",
-                                "consultative_opinions": "نظرات مشورتی (اختیاری)",
-                                "key_points": ["نکته 1", "نکته 2", ...],
-                                "examples": ["مثال 1", "مثال 2", ...]
-                            }`;
-
-                            let chatHistory = [];
-                            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                            const payload = {
-                                contents: chatHistory,
-                                generationConfig: {
-                                    responseMimeType: "application/json",
-                                    responseSchema: {
-                                        type: "OBJECT",
-                                        properties: {
-                                            "analysis": { "type": "STRING" },
-                                            "consultative_opinions": { "type": "STRING" },
-                                            "key_points": {
-                                                "type": "ARRAY",
-                                                "items": { "type": "STRING" }
-                                            },
-                                            "examples": {
-                                                "type": "ARRAY",
-                                                "items": { "type": "STRING" }
-                                            }
-                                        },
-                                        "required": ["analysis", "key_points"]
-                                    }
-                                }
-                            };
-                            const apiKey = "AIzaSyDRy3ttBs8GtefyzCxxu5RiCkWrw6UsSPo"; // کلید API شما اینجا قرار داده شد
-                            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                            console.log("Sending request to Gemini API...");
-                            const response = await exponentialBackoffFetch(apiUrl, { 
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload)
-                            });
-
-                            const result = await response.json();
-                            console.log("Raw API result:", result); 
-
-                            let generatedContent = {};
-
-                            if (result.candidates && result.candidates.length > 0 &&
-                                result.candidates[0].content && result.candidates[0].content.parts &&
-                                result.candidates[0].content.parts.length > 0) {
-                                const jsonText = result.candidates[0].content.parts[0].text;
-                                console.log("Raw JSON text from LLM:", jsonText); 
-                                try {
-                                    generatedContent = JSON.parse(jsonText);
-                                    await saveArticleAnalysis(articleId, generatedContent); 
-                                    console.log(`تحلیل برای ${articleId} تولید و ذخیره شد.`);
-                                } catch (parseError) {
-                                    console.error("Failed to parse JSON from LLM:", parseError);
-                                    analysisContentDisplay.innerHTML = `<p class="error">خطا در پردازش پاسخ هوش مصنوعی: ساختار JSON نامعتبر است. <br>پاسخ خام: <code>${jsonText.substring(0, 200)}...</code></p>`;
-                                    return;
-                                }
-                            } else {
-                                console.error("Unexpected API response structure:", result);
-                                analysisContentDisplay.innerHTML = `<p class="error">خطا: پاسخی از هوش مصنوعی دریافت نشد یا ساختار آن غیرمنتظره بود. <br>لطفاً کنسول را برای جزئیات بیشتر بررسی کنید.</p>`;
-                                return;
-                            }
-
-                            displayAnalysisContent(generatedContent);
-
-                        } catch (error) {
-                            console.error('Error generating analysis (outer catch):', error);
-                            analysisContentDisplay.innerHTML = `<p class="error">خطا در تولید تحلیل: ${error.message}. لطفاً دوباره تلاش کنید.</p>`;
-                        }
-                    });
-                    actionsDiv.appendChild(analysisIcon);
-
-                    // دکمه کپی
-                    const copyButton = createActionIconSpan('fa-copy', 'کپی متن ماده');
-                    copyButton.classList.add('copy-icon'); 
-                    
-                    const copyFeedback = document.createElement('span');
-                    copyFeedback.classList.add('copy-feedback');
-                    copyFeedback.textContent = 'کپی شد!';
-                    copyButton.appendChild(copyFeedback); 
-
-                    copyButton.addEventListener('click', () => {
-                        const textToCopy = `${titleText}\n${articleNode.textContent.trim()}`;
-                        const textarea = document.createElement('textarea');
-                        textarea.value = textToCopy;
-                        textarea.style.position = 'fixed'; 
-                        textarea.style.opacity = 0;
-                        document.body.appendChild(textarea);
-                        textarea.select();
-                        try {
-                            document.execCommand('copy');
-                            copyFeedback.classList.add('show');
-                            setTimeout(() => {
-                                copyFeedback.classList.remove('show');
-                            }, 1500);
-                        } catch (err) {
-                            console.error('Failed to copy text: ', err);
-                        }
-                        document.body.removeChild(textarea);
-                    });
-                    actionsDiv.appendChild(copyButton);
-
-                    articleCardDiv.appendChild(actionsDiv);
-                    // --- پایان اضافه کردن آیکون‌ها و دکمه کپی ---
-
-                    fragment.appendChild(articleCardDiv); // Append to fragment
-                }
-                articlesContainer.appendChild(fragment); // Append fragment to DOM
-            }
-
-            /**
-             * Displays the AI-generated analysis content in the analysis modal.
-             * @param {object} generatedContent - The parsed JSON content from the AI.
-             */
-            function displayAnalysisContent(generatedContent) {
-                let displayHtml = ``; // Removed the warning section as requested
-
-                if (generatedContent.analysis) {
-                    displayHtml += `<h3 class="analysis-section-title">تحلیل ماده</h3><p>${generatedContent.analysis}</p>`;
-                }
-                if (generatedContent.consultative_opinions) {
-                    displayHtml += `<h3 class="analysis-section-title">نظرات مشورتی</h3><p>${generatedContent.consultative_opinions}</p>`;
-                }
-                if (generatedContent.key_points && generatedContent.key_points.length > 0) {
-                    displayHtml += `<h3 class="analysis-section-title">نکات کلیدی</h3><ul class="analysis-list">`;
-                    generatedContent.key_points.forEach(point => {
-                        displayHtml += `<li>${point}</li>`;
-                    });
-                    displayHtml += `</ul>`;
-                }
-                if (generatedContent.examples && generatedContent.examples.length > 0) {
-                    displayHtml += `<h3 class="analysis-section-title">مثال‌ها</h3><ul class="analysis-list">`;
-                    generatedContent.examples.forEach(example => {
-                        displayHtml += `<li>${example}</li>`;
-                    });
-                    displayHtml += `</ul>`;
-                }
-                analysisContentDisplay.innerHTML = displayHtml;
-            }
-
-            /**
-             * Parses an article ID string (e.g., "ماده_1", "ماده_1328_2") into a numeric array for sorting.
-             * @param {string} id - The article ID string.
-             * @returns {number[]} An array [mainNumber, subNumber] for sorting.
-             */
-            function parseArticleIdForSorting(id) {
-                const parts = id.replace('ماده_', '').split('_');
-                const mainNumber = parseInt(parts[0], 10);
-                const subNumber = parts.length > 1 ? parseInt(parts[1], 10) : 0; // 'مکرر' parts
-                return [mainNumber, subNumber];
-            }
-
-            /**
-             * Helper function to sort articles based on their ID.
-             * @param {Array<Node>} articles - The array of XML article nodes.
-             * @returns {Array<Node>} A new array with sorted articles.
-             */
-            function sortArticles(articles) {
-                // Create a shallow copy to avoid mutating the original array passed if it's from elsewhere
-                return [...articles].sort((a, b) => {
-                    const [aMain, aSub] = parseArticleIdForSorting(a.tagName);
-                    const [bMain, bSub] = parseArticleIdForSorting(b.tagName);
-
-                    if (aMain !== bMain) {
-                        return aMain - bMain;
-                    }
-                    return aSub - bSub;
-                });
-            }
-
-            /**
-             * Normalizes Persian characters for consistent search and display.
-             * @param {string} text - The input text.
-             * @returns {string} The normalized text.
-             */
-            function normalizePersianText(text) {
-                if (!text) return '';
-                return text
-                    .replace(/ي/g, 'ی') 
-                    .replace(/ك/g, 'ک') 
-                    .replace(/ۀ/g, 'ه') 
-                    .replace(/ة/g, 'ت'); 
-            }
-
-            let debounceTimer;
-            /**
-             * Debounces a function call, ensuring it's only executed after a certain delay.
-             * @param {function} func - The function to debounce.
-             * @param {number} delay - The delay in milliseconds.
-             */
-            const debounce = (func, delay) => {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(func, delay);
-            };
-
-            /**
-             * Performs a search on the currently loaded articles.
-             */
-            function performSearch() {
-                showBookmarksBtn.classList.remove('active-filter');
+            async getAiAnalysis(articleTitle, articleContent) {
+                // ===================================================================
+                // ================== کلید API خود را اینجا قرار دهید ==================
+                // ===================================================================
+                const apiKey = "اینجا_کلید_API_خود_را_قرار_دهید"; 
                 
-                const query = searchInput.value.trim(); 
-                
-                if (query === '') {
-                    displayCurrentLawArticles(); 
-                    return;
+                if (apiKey === "اینجا_کلید_API_خود_را_قرار_دهید") {
+                    return { error: "کلید API هوش مصنوعی در کد تنظیم نشده است. لطفاً فایل index.html را ویرایش کرده و کلید خود را در متغیر apiKey قرار دهید." };
                 }
 
-                const normalizedLowerCaseQuery = normalizePersianText(query).toLowerCase();
-                const queryWords = normalizedLowerCaseQuery.split(/\s+/).filter(word => word.length > 0); 
+                const generatePrompt = (title, content) => `
+                    شما یک دستیار حقوقی متخصص در قوانین ایران هستید. وظیفه شما تحلیل دقیق و جامع یک ماده قانونی است.
+                    ماده قانونی زیر را با توجه به ساختار JSON مشخص شده، تحلیل کنید. پاسخ شما باید کاملاً به زبان فارسی و در قالب یک آبجکت JSON معتبر باشد.
+                    **ماده قانونی:**
+                    عنوان: ${title}
+                    متن: ${content}
+                    **ساختار خروجی JSON الزامی:**
+                    {
+                      "analysis": "یک تحلیل کامل و جامع از ماده، شامل تفسیر حقوقی، هدف قانون‌گذار و جایگاه آن در نظام حقوقی.",
+                      "key_points": ["نکته کلیدی اول به صورت خلاصه.", "نکته کلیدی دوم.", "..."],
+                      "consultative_opinions": "ارائه نظرات مشورتی رایج یا احتمالی مرتبط با این ماده. اگر نظری وجود ندارد، این فیلد را خالی بگذارید.",
+                      "examples": [{"scenario": "شرح یک سناریوی واقعی یا فرضی.", "application": "نحوه اعمال این ماده در سناریوی شرح داده شده."}],
+                      "related_articles": [{"article_name": "نام ماده مرتبط (مثال: ماده ۱۲۰ قانون مدنی)", "relation_description": "توضیح مختصر نحوه ارتباط این دو ماده."}]
+                    }`;
 
-                const filteredArticles = allArticles.filter(articleNode => {
-                    const title = normalizePersianText(articleNode.tagName.replace('ماده_', 'ماده ').replace('_', ' مکرر ')).toLowerCase();
-                    const content = normalizePersianText(articleNode.textContent).toLowerCase();
-                    
-                    return queryWords.every(word => title.includes(word) || content.includes(word));
-                });
+                const prompt = generatePrompt(articleTitle, articleContent);
+                const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
-                renderArticles(filteredArticles, query); 
-                window.scrollTo(0, 0); 
-            }
-
-            // Apply debounce to search input
-            searchInput.addEventListener('input', () => debounce(performSearch, 300));
-
-            clearSearchButton.addEventListener('click', () => {
-                if (currentLawId) { 
-                    searchInput.value = ''; // Clear input field
-                    displayCurrentLawArticles(); // Reset to full sorted list of current law
-                } else {
-                    articlesContainer.innerHTML = '<p class="initial-message">قانون مورد نظر خود را از بالا انتخاب کنید.</p>';
-                    document.querySelector('h1').textContent = 'قوانین ایران'; 
-                    searchInput.value = ''; // Clear input field
-                }
-            });
-
-            /**
-             * Displays the full, sorted list of articles for the currently selected law.
-             * This function ensures consistent rendering from the pre-sorted `allArticles`.
-             */
-            async function displayCurrentLawArticles() {
-                searchInput.value = ''; 
-                showBookmarksBtn.classList.remove('active-filter'); 
-                console.log("[displayCurrentLawArticles] Preparing to render all articles for current law. allArticles (first 5):", allArticles.slice(0, 5).map(a => a.tagName));
-                
-                await renderArticles(allArticles); 
-                window.scrollTo(0, 0); 
-            }
-
-            /**
-             * Filters and displays only the bookmarked articles.
-             */
-            async function filterBookmarks() {
-                searchInput.value = ''; 
-                showBookmarksBtn.classList.add('active-filter');
-                
-                const bookmarkedArticles = [];
-                for (const articleNode of allArticles) {
-                    const savedMetadata = await getArticleMetadata(articleNode.tagName);
-                    if (savedMetadata.bookmarked) {
-                        bookmarkedArticles.push(articleNode);
-                    }
-                }
-                // Bookmarked articles are also rendered in their natural sorted order
-                renderArticles(bookmarkedArticles);
-                window.scrollTo(0, 0); 
-            }
-
-            showBookmarksBtn.addEventListener('click', filterBookmarks);
-
-            // قابلیت حالت تاریک
-            darkModeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                if (document.body.classList.contains('dark-mode')) {
-                    localStorage.setItem('darkMode', 'enabled');
-                    darkModeToggle.textContent = 'حالت روشن';
-                } else {
-                    localStorage.setItem('darkMode', 'disabled');
-                    darkModeToggle.textContent = 'حالت تاریک';
-                }
-            });
-
-            // بررسی وضعیت حالت تاریک در هنگام بارگذاری صفحه
-            if (localStorage.getItem('darkMode') === 'enabled') {
-                document.body.classList.add('dark-mode');
-                darkModeToggle.textContent = 'حالت روشن';
-            } else {
-                darkModeToggle.textContent = 'حالت تاریک';
-            }
-
-            // --- منطق مودال یادداشت‌نویسی ---
-            saveNoteButton.addEventListener('click', async () => {
-                const noteContent = noteTextarea.value;
-                if (currentArticleId) {
-                    const data = await getArticleMetadata(currentArticleId);
-                    data.note = noteContent;
-                    await saveArticleMetadata(currentArticleId, data);
-                    const articleCardDiv = document.querySelector(`[data-article-id="${currentArticleId}"]`);
-                    if (articleCardDiv) {
-                        const noteIcon = articleCardDiv.querySelector('.fa-sticky-note');
-                        if (noteIcon) {
-                            noteIcon.classList.toggle('has-note', noteContent.length > 0);
-                        }
-                    }
-                }
-                noteModal.style.display = 'none';
-            });
-
-            // بستن مودال‌ها با کلیک بیرون از آن‌ها
-            window.addEventListener('click', (event) => {
-                if (event.target === noteModal) {
-                    noteModal.style.display = 'none';
-                }
-                if (event.target === analysisModal) {
-                    analysisModal.style.display = 'none';
-                }
-            });
-            // --- پایان منطق مودال‌ها ---
-
-            // --- منطق دکمه رفتن به بالای صفحه ---
-            window.addEventListener('scroll', () => {
-                if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-                    scrollToTopBtn.style.display = 'block';
-                } else {
-                    scrollToTopBtn.style.display = 'none';
-                }
-            });
-
-            scrollToTopBtn.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-            // --- پایان منطق دکمه رفتن به بالای صفحه ---
-
-            /**
-             * Manages the countdown and disables/enables law selection buttons.
-             * The countdown message is displayed in the dedicated container below the buttons.
-             * @param {number} initialCount - The starting number for the countdown.
-             */
-            function startCountdownAndDisableButtons(initialCount) {
-                let count = initialCount;
-                const buttons = lawSelectionControls.querySelectorAll('button');
-
-                // Disable all buttons and add styling
-                buttons.forEach(button => {
-                    button.disabled = true; // Disable HTML button directly
-                    button.classList.add('disabled-for-delay'); // Add a class for visual styling
-                    // No need to store original text, as text content is not changed
-                });
-
-                // Clear any existing countdown interval
-                if (countdownIntervalId) {
-                    clearInterval(countdownIntervalId);
-                }
-
-                // Start the countdown
-                countdownIntervalId = setInterval(() => {
-                    countdownMessageContainer.textContent = `لطفا برای تغییر قانون صبر کنید (${count})`;
-                    count--;
-
-                    if (count < 0) {
-                        clearInterval(countdownIntervalId);
-                        isLawButtonClickable = true;
-                        buttons.forEach(button => {
-                            button.disabled = false;
-                            button.classList.remove('disabled-for-delay');
-                            // Restore original text (already there, no change needed)
-                        });
-                        countdownMessageContainer.textContent = ''; // Clear the countdown message
-                        lawButtonTimeoutId = null;
-                        console.log("Law buttons re-enabled after countdown.");
-                    }
-                }, 1000); // Update every 1 second
-            }
-
-            /**
-             * Loads a specific law's XML content, parses it, and updates the display.
-             * @param {string} lawId - The ID of the law to load (e.g., 'madani').
-             */
-            async function loadLaw(lawId) {
-                // Check if buttons are currently disabled due to delay
-                if (!isLawButtonClickable) {
-                    console.log(`Buttons are disabled. Cannot click ${lawId} yet.`);
-                    return;
-                }
-
-                // Start countdown and disable buttons for 10 seconds
-                isLawButtonClickable = false;
-                startCountdownAndDisableButtons(10); // Start countdown from 10
-
-                // If the same law is already active, just re-display it (this case is handled by the delay check above)
-                if (currentLawId === lawId) {
-                    console.log(`Law ${lawId} is already active. Re-displaying current articles.`);
-                    await displayCurrentLawArticles(); 
-                    return;
-                }
-
-                currentLawId = lawId;
-                const lawConfig = lawConfigs.find(law => law.id === lawId);
-                if (!lawConfig) {
-                    articlesContainer.innerHTML = `<p class="error">خطا: قانون "${lawId}" یافت نشد.</p>`;
-                    return;
-                }
-
-                // Update main page title and search placeholder
-                document.querySelector('h1').textContent = lawConfig.name;
-                searchInput.placeholder = `جستجو در مواد ${lawConfig.name}...`;
-
-                // Activate the current law button visually
-                document.querySelectorAll('.law-selection-controls button').forEach(button => {
-                    if (button.dataset.lawId === lawId) {
-                        button.classList.add('active-law');
-                    } else {
-                        button.classList.remove('active-law');
-                    }
-                });
-
-                // Show loading state and scroll to top
-                articlesContainer.innerHTML = '<p class="loading">در حال بارگذاری مواد قانون...</p>';
-                window.scrollTo(0, 0); 
-                searchInput.value = ''; 
-                showBookmarksBtn.classList.remove('active-filter'); 
-
-                let xmlString = null;
-                const xmlStorageKey = `law_${lawId}_xml`; 
-                const lawXmlUrl = baseGithubUrl + lawConfig.fileName;
-
-                // Caching Logic: First load from cache, subsequent loads from GitHub
-                if (loadedLawsStatus[lawId] === 'first_loaded') {
-                    // Subsequent load for this law: bypass cache, fetch directly from GitHub
-                    console.log(`Law ${lawId} already loaded once. Fetching directly from GitHub.`);
-                    try {
-                        const response = await exponentialBackoffFetch(lawXmlUrl);
-                        if (!response.ok) {
-                            throw new Error(`خطا در بارگذاری فایل از گیت‌هاب: ${response.status} ${response.statusText}`);
-                        }
-                        xmlString = await response.text();
-                        console.log(`XML content for ${lawId} fetched directly from GitHub successfully.`);
-                    } catch (error) {
-                        console.error(`Error fetching XML for ${lawId} directly from GitHub:`, error);
-                        articlesContainer.innerHTML = `<p class="error">خطا در بارگذاری مواد قانون ${lawConfig.name} از مخزن اصلی: ${error.message}.</p>`;
-                        return;
-                    }
-                } else {
-                    // First load for this law: try cache first
-                    try {
-                        const cachedXml = await getDataFromStore(XML_STORE_NAME, xmlStorageKey);
-                        if (cachedXml && cachedXml.data) {
-                            xmlString = LZString.decompressFromUTF16(cachedXml.data);
-                            console.log(`XML content for ${lawId} loaded from IndexedDB (first load).`);
-                            loadedLawsStatus[lawId] = 'first_loaded'; // Mark as first loaded
-                        }
-                    } catch (error) {
-                        console.error(`Error loading XML for ${lawId} from IndexedDB:`, error);
-                    }
-
-                    if (!xmlString) {
-                        // If not in IndexedDB, fetch from GitHub and save
-                        try {
-                            console.log(`Fetching XML for ${lawId} from GitHub (first load, not in cache): ${lawXmlUrl}`);
-                            const response = await exponentialBackoffFetch(lawXmlUrl);
-                            if (!response.ok) {
-                                throw new Error(`خطا در بارگذاری فایل از گیت‌هاب: ${response.status} ${response.statusText}`);
-                            }
-                            xmlString = await response.text();
-                            console.log(`XML content for ${lawId} fetched from GitHub successfully.`);
-                            const compressedXml = LZString.compressToUTF16(xmlString);
-                            await putDataIntoStore(XML_STORE_NAME, { id: xmlStorageKey, data: compressedXml });
-                            console.log(`XML content for ${lawId} saved to IndexedDB.`);
-                            loadedLawsStatus[lawId] = 'first_loaded'; // Mark as first loaded
-                        } catch (error) {
-                            console.error(`There was a problem fetching the XML file for ${lawId} from GitHub:`, error);
-                            articlesContainer.innerHTML = `<p class="error">خطا در بارگذاری مواد قانون ${lawConfig.name}: ${error.message}. لطفاً اتصال اینترنت خود را بررسی کنید.</p>`;
-                            return;
-                        }
-                    }
-                }
-
-                // Finally, parse XML and render articles
                 try {
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlString, 'application/xml');
+                    const response = await fetch(geminiApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: { responseMimeType: "application/json" }
+                        })
+                    });
 
-                    if (xmlDoc.getElementsByTagName("parsererror").length > 0) {
-                        console.error("XML parsing error:", xmlDoc.getElementsByTagName("parsererror")[0]);
-                        throw new Error("خطا در تجزیه فایل XML. لطفاً از صحت ساختار XML اطمینان حاصل کنید.");
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("Gemini API Error:", errorData);
+                        return { error: `خطا از سرویس هوش مصنوعی: ${errorData.error?.message || 'Unknown error'}` };
                     }
 
-                    // Populate allArticles and then sort it
-                    allArticles = Array.from(xmlDoc.querySelectorAll('قوانین > *'));
-                    console.log(`Raw articles loaded for ${lawConfig.name} (first 5):`, allArticles.slice(0, 5).map(a => a.tagName));
-                    
-                    allArticles = sortArticles(allArticles); // Use the new helper function for sorting
-                    console.log(`Articles sorted after loading for ${lawConfig.name} (first 5):`, allArticles.slice(0, 5).map(a => a.tagName));
+                    const data = await response.json();
+                    const jsonText = data.candidates[0].content.parts[0].text;
+                    return JSON.parse(jsonText);
 
-
-                    if (allArticles.length === 0) {
-                        articlesContainer.innerHTML = `<p class="no-results">ماده‌ای در فایل XML قانون ${lawConfig.name} یافت نشد. لطفاً ساختار فایل را بررسی کنید.</p>`;
-                        return;
-                    }
-
-                    displayCurrentLawArticles(); // Display articles after loading and sorting
                 } catch (error) {
-                    console.error('Error parsing XML content:', error);
-                    articlesContainer.innerHTML = `<p class="error">خطا در پردازش مواد قانون ${lawConfig.name}: ${error.message}</p>`;
+                    console.error("Error calling Gemini API:", error);
+                    return { error: `خطای شبکه هنگام ارتباط با سرویس تحلیل: ${error.message}` };
                 }
             }
+        };
 
-            // Create law selection buttons dynamically
-            lawConfigs.forEach(law => {
-                const button = document.createElement('button');
-                button.textContent = law.name;
-                button.dataset.lawId = law.id;
-                button.addEventListener('click', () => loadLaw(law.id));
-                lawSelectionControls.appendChild(button);
-            });
-
-            // --- Initial App Load ---
-            openDatabase().then(async () => {
-                // Display initial message
-                articlesContainer.innerHTML = '<p class="initial-message">قانون مورد نظر خود را از بالا انتخاب کنید.</p>';
-                document.querySelector('h1').textContent = 'قوانین ایران'; // Reset title
-            }).catch(error => {
-                console.error('Failed to open IndexedDB:', error);
-                articlesContainer.innerHTML = `<p class="error">خطا در راه‌اندازی پایگاه داده محلی: ${error.message}</p>`;
-            });
-
-            // Service Worker Registration
-            // Service workers require HTTPS or localhost. This check prevents errors in non-secure contexts like file:// or blob://
-            if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('service-worker.js')
-                        .then(registration => {
-                            console.log('Service Worker registered with scope:', registration.scope);
-                        })
-                        .catch(error => {
-                            console.error('Service Worker registration failed:', error);
-                        });
+        const Renderer = {
+            renderStatus(container, message) { container.innerHTML = `<p class="status-message">${message}</p>`; },
+            buildNavigationTree(xmlDoc) {
+                const root = xmlDoc.querySelector('قوانین');
+                if (!root) return '';
+                const createNode = (element) => {
+                    const li = document.createElement('li');
+                    const title = document.createElement('span');
+                    title.textContent = element.tagName.replace(/_/g, ' ');
+                    title.className = 'nav-item';
+                    const children = Array.from(element.children);
+                    if (children.length > 0 && isNaN(parseInt(children[0].tagName.replace('ماده_','')))) {
+                         const childList = document.createElement('ul'); childList.className = 'nav-children'; children.forEach(child => childList.appendChild(createNode(child))); li.appendChild(title); li.appendChild(childList);
+                    } else { title.dataset.scrollTo = element.tagName; li.appendChild(title); }
+                    return li;
+                };
+                const navList = document.createElement('ul'); navList.id = 'navigationTree';
+                Array.from(root.children).forEach(child => {
+                    const isStructural = Array.from(child.children).length > 0 && isNaN(parseInt(child.children[0].tagName.replace('ماده_','')));
+                    if(isStructural || Array.from(root.children).every(c => !c.querySelector('*'))){ navList.appendChild(createNode(child)); }
                 });
-            } else {
-                console.warn('Service Worker not registered. Service workers require HTTPS or localhost.');
+                if (navList.children.length === 0) {
+                     state.allArticles.forEach(articleEl => {
+                         const li = document.createElement('li'); const title = document.createElement('span'); title.className = 'nav-item'; title.textContent = articleEl.tagName.replace(/_/g, ' '); title.dataset.scrollTo = articleEl.tagName; li.appendChild(title); navList.appendChild(li);
+                     });
+                }
+                return navList;
+            },
+            async renderArticleCard(articleEl) {
+                const articleId = articleEl.tagName;
+                const titleText = articleId.replace('ماده_', 'ماده ').replace(/_/g, ' مکرر ');
+                const contentHTML = articleEl.textContent.trim().replace(/\n/g, '<br>');
+                const metadata = await Database.get(config.db.stores.metadata, `${state.currentLawId}_${articleId}`) || {};
+                const card = document.createElement('div'); card.className = 'article-card'; card.id = articleId; card.dataset.articleId = articleId;
+                card.innerHTML = `<div class="article-header"><h2 class="article-title">${titleText}</h2><div class="article-actions"><button class="icon-button action-icon ${metadata.bookmarked ? 'bookmarked' : ''}" data-action="bookmark" title="نشان‌گذاری"><i class="fas fa-bookmark"></i></button><button class="icon-button action-icon ${metadata.note ? 'has-note' : ''}" data-action="note" title="یادداشت"><i class="fas fa-sticky-note"></i></button><button class="icon-button action-icon" data-action="analyze" title="تحلیل هوشمند"><i class="fas fa-brain"></i></button><button class="icon-button action-icon" data-action="copy" title="کپی متن"><i class="fas fa-copy"></i></button></div></div><div class="article-content">${contentHTML}</div>`;
+                return card;
+            },
+            async renderArticles(articleElements) {
+                this.renderStatus(ui.articlesContainer, 'در حال آماده‌سازی نمایش مواد...');
+                if (articleElements.length === 0) { this.renderStatus(ui.articlesContainer, 'ماده‌ای یافت نشد.'); return; }
+                const fragment = document.createDocumentFragment();
+                for (const el of articleElements) { fragment.appendChild(await this.renderArticleCard(el)); }
+                ui.articlesContainer.innerHTML = ''; ui.articlesContainer.appendChild(fragment);
+            },
+            renderAnalysisContent(data) {
+                if (data.error) { ui.analysisContent.innerHTML = `<p class="status-message error">${data.error}</p>`; return; }
+                let html = '';
+                if(data.analysis) html += `<h3><i class="fas fa-gavel"></i> تحلیل حقوقی</h3><p>${data.analysis}</p>`;
+                if(data.key_points?.length) html += `<h3><i class="fas fa-list-check"></i> نکات کلیدی</h3><ul>${data.key_points.map(p => `<li>${p}</li>`).join('')}</ul>`;
+                if(data.consultative_opinions) html += `<h3><i class="fas fa-comments"></i> نظرات مشورتی</h3><p>${data.consultative_opinions}</p>`;
+                if(data.examples?.length) {
+                    html += `<h3><i class="fas fa-file-alt"></i> مثال‌های کاربردی</h3>`;
+                    data.examples.forEach(ex => { html += `<div class="example-box"><h4>سناریو:</h4><p>${ex.scenario}</p><h4>نحوه اعمال ماده:</h4><p>${ex.application}</p></div>`; });
+                }
+                if(data.related_articles?.length) {
+                     html += `<h3><i class="fas fa-link"></i> مواد مرتبط</h3>`;
+                     data.related_articles.forEach(rel => { html += `<div class="related-article"><strong>${rel.article_name}:</strong> ${rel.relation_description}</div>`; });
+                }
+                ui.analysisContent.innerHTML = html;
             }
-        });
+        };
+
+        const App = {
+            async init() { this.setupEventListeners(); this.populateLawSelector(); this.initTheme(); },
+            setupEventListeners() {
+                ui.lawSelector.addEventListener('change', () => this.loadLaw(ui.lawSelector.value));
+                ui.darkModeToggle.addEventListener('click', this.toggleTheme);
+                ui.searchInput.addEventListener('input', () => this.debounce(this.performSearch, 300));
+                ui.showBookmarksBtn.addEventListener('click', this.toggleBookmarkFilter.bind(this));
+                document.querySelectorAll('[data-close-modal]').forEach(el => el.addEventListener('click', () => this.closeModal(el.dataset.closeModal)));
+                ui.noteModal.addEventListener('click', e => { if (e.target === ui.noteModal) this.closeModal('noteModal')});
+                ui.analysisModal.addEventListener('click', e => { if (e.target === ui.analysisModal) this.closeModal('analysisModal')});
+                ui.articlesContainer.addEventListener('click', e => { const button = e.target.closest('[data-action]'); if (!button) return; const action = button.dataset.action; const card = button.closest('.article-card'); const articleId = card.dataset.articleId; this.handleArticleAction(action, articleId, card); });
+                ui.navigationTreeContainer.addEventListener('click', e => { const target = e.target.closest('[data-scroll-to]'); if(target) { const articleId = target.dataset.scrollTo; document.getElementById(articleId)?.scrollIntoView({ behavior: 'smooth' }); if(window.innerWidth <= 992) { ui.sidebar.classList.remove('open'); ui.overlay.classList.remove('show'); } } });
+                ui.menuToggle.addEventListener('click', () => { ui.sidebar.classList.toggle('open'); ui.overlay.classList.toggle('show'); });
+                ui.overlay.addEventListener('click', () => { ui.sidebar.classList.remove('open'); ui.overlay.classList.remove('show'); });
+                ui.saveNoteBtn.addEventListener('click', this.saveNote.bind(this));
+            },
+            async loadLaw(lawId) {
+                if (!lawId) { state.currentLawId = null; Renderer.renderStatus(ui.articlesContainer, 'برای شروع، یک قانون را از منوی بالا انتخاب کنید.'); Renderer.renderStatus(ui.navigationTreeContainer, 'قانونی انتخاب نشده است.'); return; }
+                state.currentLawId = lawId;
+                Renderer.renderStatus(ui.articlesContainer, 'در حال بارگذاری قانون...'); Renderer.renderStatus(ui.navigationTreeContainer, 'در حال ساخت فهرست...');
+                try {
+                    const xmlString = await API.getLawXml(lawId);
+                    const xmlDoc = new DOMParser().parseFromString(xmlString, 'application/xml');
+                    state.currentLawXml = xmlDoc;
+                    const articles = Array.from(xmlDoc.querySelectorAll('قوانین > *'));
+                    articles.sort((a, b) => { const parseId = id => id.replace('ماده_', '').split('_').map(Number); const [aMain, aSub = 0] = parseId(a.tagName); const [bMain, bSub = 0] = parseId(b.tagName); return aMain - bMain || aSub - bSub; });
+                    state.allArticles = articles; state.articleMap.clear(); articles.forEach(el => state.articleMap.set(el.tagName, el));
+                    ui.navigationTreeContainer.innerHTML = ''; ui.navigationTreeContainer.appendChild(Renderer.buildNavigationTree(xmlDoc));
+                    await Renderer.renderArticles(state.allArticles);
+                } catch (error) { console.error("Error loading law:", error); Renderer.renderStatus(ui.articlesContainer, `خطا در بارگذاری قانون: ${error.message}`); }
+            },
+            async handleArticleAction(action, articleId, card) {
+                state.currentArticleId = articleId;
+                const metadataKey = `${state.currentLawId}_${articleId}`;
+                const metadata = await Database.get(config.db.stores.metadata, metadataKey) || { id: metadataKey };
+                switch (action) {
+                    case 'bookmark': metadata.bookmarked = !metadata.bookmarked; await Database.put(config.db.stores.metadata, metadata); card.querySelector('[data-action="bookmark"]').classList.toggle('bookmarked', metadata.bookmarked); break;
+                    case 'note': ui.noteModalTitle.textContent = `یادداشت برای ${articleId.replace('ماده_', 'ماده ').replace('_', ' مکرر ')}`; ui.noteTextarea.value = metadata.note ? LZString.decompressFromUTF16(metadata.note) : ''; this.openModal('noteModal'); break;
+                    case 'analyze':
+                        ui.analysisModalTitle.textContent = `تحلیل هوشمند ${articleId.replace('ماده_', 'ماده ').replace('_', ' مکرر ')}`; this.openModal('analysisModal');
+                        Renderer.renderStatus(ui.analysisContent, 'در حال تولید تحلیل...');
+                        const cachedAnalysis = await Database.get(config.db.stores.analysisCache, metadataKey);
+                        if (cachedAnalysis) { console.log('Analysis loaded from cache.'); Renderer.renderAnalysisContent(JSON.parse(LZString.decompressFromUTF16(cachedAnalysis.data))); return; }
+                        const articleEl = state.articleMap.get(articleId);
+                        const analysisResult = await API.getAiAnalysis(ui.analysisModalTitle.textContent, articleEl.textContent);
+                        Renderer.renderAnalysisContent(analysisResult);
+                        if (!analysisResult.error) { const compressed = LZString.compressToUTF16(JSON.stringify(analysisResult)); await Database.put(config.db.stores.analysisCache, { id: metadataKey, data: compressed }); }
+                        break;
+                    case 'copy': const textToCopy = `${card.querySelector('.article-title').textContent}\n${state.articleMap.get(articleId).textContent.trim()}`; navigator.clipboard.writeText(textToCopy).then(() => { const btn = card.querySelector('[data-action="copy"]'); btn.style.color = 'var(--color-primary)'; setTimeout(() => btn.style.color = '', 1000); }); break;
+                }
+            },
+            async saveNote() {
+                const metadataKey = `${state.currentLawId}_${state.currentArticleId}`;
+                const metadata = await Database.get(config.db.stores.metadata, metadataKey) || { id: metadataKey };
+                const noteText = ui.noteTextarea.value.trim();
+                if (noteText) { metadata.note = LZString.compressToUTF16(noteText); } else { delete metadata.note; }
+                await Database.put(config.db.stores.metadata, metadata);
+                this.closeModal('noteModal');
+                const card = document.getElementById(state.currentArticleId);
+                if (card) { card.querySelector('[data-action="note"]').classList.toggle('has-note', !!noteText); }
+            },
+            async performSearch() {
+                const query = ui.searchInput.value.trim().toLowerCase();
+                if (state.isFilterActive.bookmarks) { this.toggleBookmarkFilter(true); return; }
+                if (!query) { await Renderer.renderArticles(state.allArticles); return; }
+                const filtered = state.allArticles.filter(el => { const title = el.tagName.replace('ماده_', 'ماده ').replace('_', ' مکرر '); const content = el.textContent.toLowerCase(); return title.includes(query) || content.includes(query); });
+                await Renderer.renderArticles(filtered);
+            },
+            async toggleBookmarkFilter(isSearching = false) {
+                if (!isSearching) { state.isFilterActive.bookmarks = !state.isFilterActive.bookmarks; ui.showBookmarksBtn.classList.toggle('active', state.isFilterActive.bookmarks); }
+                if (!state.isFilterActive.bookmarks) { await Renderer.renderArticles(state.allArticles); return; }
+                const bookmarkedArticles = [];
+                for (const articleEl of state.allArticles) { const metadata = await Database.get(config.db.stores.metadata, `${state.currentLawId}_${articleEl.tagName}`); if (metadata?.bookmarked) { bookmarkedArticles.push(articleEl); } }
+                const query = ui.searchInput.value.trim().toLowerCase();
+                if (query) { const searchAndBookmarked = bookmarkedArticles.filter(el => { const content = el.textContent.toLowerCase(); return content.includes(query); }); await Renderer.renderArticles(searchAndBookmarked); } else { await Renderer.renderArticles(bookmarkedArticles); }
+            },
+            populateLawSelector() { const options = config.laws.map(law => `<option value="${law.id}">${law.name}</option>`).join(''); ui.lawSelector.innerHTML = `<option value="">-- انتخاب قانون --</option>${options}`; },
+            initTheme() { const savedTheme = localStorage.getItem('theme') || 'light'; document.body.dataset.theme = savedTheme; ui.darkModeToggle.querySelector('i').className = `fas fa-${savedTheme === 'light' ? 'moon' : 'sun'}`; },
+            toggleTheme() { const currentTheme = document.body.dataset.theme; const newTheme = currentTheme === 'light' ? 'dark' : 'light'; document.body.dataset.theme = newTheme; localStorage.setItem('theme', newTheme); ui.darkModeToggle.querySelector('i').className = `fas fa-${newTheme === 'light' ? 'moon' : 'sun'}`; },
+            openModal(modalId) { state.activeModal = ui[modalId]; state.activeModal.classList.add('show'); },
+            closeModal(modalId) { ui[modalId].classList.remove('show'); if(state.activeModal === ui[modalId]) state.activeModal = null; },
+            debounce(func, delay) { clearTimeout(this.debounceTimer); this.debounceTimer = setTimeout(() => func.call(this), delay); }
+        };
+
+        App.init();
+    });
     </script>
 </body>
 </html>
